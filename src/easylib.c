@@ -181,3 +181,9 @@ enum EasyBoolean { FALSE = 0, TRUE = 1 };
 
 /* EasyNothing */
 const EasyNothing NOTHING = NULL;
+
+/*******************************************************************************
+ *  GENERIC LIBRARY IMPLEMENTATION
+*******************************************************************************/
+
+/* TODO(dchu) */
