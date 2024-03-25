@@ -45,9 +45,16 @@
  *
 *******************************************************************************/
 
+#pragma once
+#ifndef __EASYLIB_H__
+#define __EASYLIB_H__
+
+#include <ctype.h>
+#include <limits.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*******************************************************************************
  *  COMMON FUNCTIONS
@@ -60,6 +67,8 @@ easy_print_error(char *msg, char *file, int line)
 
 /* We explicitly convert the condition to an int so that it will not cause problems for the function call */
 #define EASY_ASSERT(condition, msg) easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
+#define EASY_GUARD(condition, msg) easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
+#define EASY_IMPOSSIBLE() easy_assert(0, "impossible!", __FILE__, __LINE__)
 
 void
 easy_assert(int condition, char *msg, char *file, int line)
@@ -70,81 +79,68 @@ easy_assert(int condition, char *msg, char *file, int line)
     }
 }
 
-#define EASY_ALLOC(size)	easy_alloc(size, __FILE__, __LINE__)
-#define EASY_REALLOC(ptr, new_size)	easy_realloc(ptr, new_size, __FILE__, __LINE__)
+#define EASY_ALLOC(nmemb, size)	easy_alloc(nmemb, size, __FILE__, __LINE__)
+#define EASY_REALLOC(ptr, nmemb, size)	easy_realloc(ptr, nmemb, size, __FILE__, __LINE__)
 #define EASY_FREE(ptr)		easy_free(ptr, __FILE__, __LINE__)
 
 void *
-easy_alloc(size_t size, char *file, int line)
+easy_alloc(size_t nmemb, size_t size, char *file, int line)
 {
-    void *ptr = calloc(1, size);
+    void *ptr = calloc(num, size);
     if (ptr == NULL) {
         easy_print_error("out of memory", file, line);
         exit(EXIT_FAILURE);
     }
+    return ptr;
 }
 
 void *
-easy_realloc(void *ptr, size_t new_size, char *file, int line)
+easy_realloc(void *ptr, size_t nmemb, size_t size, char *file, int line)
 {
+    ASSERT_GUARD(nmemb > 0 && size > 0, "nmemb and size should be positive");
+    ASSERT_GUARD(nmemb > SIZE_MAX / size, "overflow");
+    const size_t new_size = nmemb * size;
     void *new_ptr = realloc(ptr, new_size);
     if (new_ptr == NULL && new_size > 0) {	/* What if new_size == 0? */
         easy_print_error("out of memory", file, line);
         exit(EXIT_FAILURE);
     }
+    return new_ptr;
 }
 
 void
 easy_free(void *ptr, char *file, int line)
 {
+    if (ptr == NULL) {
+        easy_print_error("freeing null pointer", file, line);
+        exit(EXIT_FAILURE);
+    }
     free(ptr);
 }
 
 /*******************************************************************************
  *  GENERIC LIBRARY DATA STRUCTURES
 *******************************************************************************/
+/* Stand-alone types */
+enum EasyBoolean;	/* We want this to evalutate to True/False as expected */
+typedef void * EasyNothing;	/* We want this to act as NULL in C */
+struct EasyText;
+struct EasyInteger;
 
+/* Composite types */
+struct EasyTable;
+struct EasyList;
+struct EasyFraction;
+
+/* Generic types */
 enum EasyGenericType;
 union EasyGenericData;
 struct EasyGenericObject;
-struct EasyTable;
-struct EasyList;
-struct EasyText;
-struct EasyInteger;
-struct EasyFraction;
-enum EasyBoolean;	/* We want this to evalutate to True/False as expected */
-typedef void * EasyNothing;	/* We want this to act as NULL in C */
 
-enum EasyGenericType {
-    EASY_TABLE_TYPE, EASY_LIST_TYPE, EASY_TEXT_TYPE,
-    EASY_INTEGER_TYPE, EASY_FRACTION_TYPE,
-    EASY_BOOLEAN_TYPE, EASY_NOTHING_TYPE,
-};
-
-union EasyGenericData {
-    struct EasyTable table,
-    struct EasyList list,
-    struct EasyText text,
-    struct EasyInteger integer,
-    struct EasyFraction fraction,
-    enum EasyBoolean boolean,
-    EasyNothing nothing,
-};
-
-struct EasyGenericObject {
-    enum EasyGenericType type;
-    union EasyGenericData data;
-};
 
 /* EasyTable */
-struct EasyTableItem {
-    enum EasyBool valid;
-    struct EasyGenericObject key;
-    struct EasyGenericObject value;
-};
-
 struct EasyTable {
-    struct EasyOptionalGenericObject *data;
+    struct EasyTableItem *data;
     size_t length;    /* The number of elements in the EasyTable */
     size_t capacity;  /* The maximum number of elements in the EasyTable */
 };
@@ -154,6 +150,12 @@ struct EasyList {
     struct EasyGenericObject *data;
     size_t length;
 };
+
+/* EasyBoolean */
+enum EasyBoolean { FALSE = 0, TRUE = 1 };
+
+/* EasyNothing */
+const EasyNothing NOTHING = NULL;
 
 /* EasyText */
 struct EasyText {
@@ -176,11 +178,34 @@ struct EasyFraction {
     struct EasyInteger denominator;
 };
 
-/* EasyBoolean */
-enum EasyBoolean { FALSE = 0, TRUE = 1 };
+/* Generic Object */
+enum EasyGenericType {
+    EASY_TABLE_TYPE, EASY_LIST_TYPE, EASY_TEXT_TYPE,
+    EASY_INTEGER_TYPE, EASY_FRACTION_TYPE,
+    EASY_BOOLEAN_TYPE, EASY_NOTHING_TYPE,
+};
 
-/* EasyNothing */
-const EasyNothing NOTHING = NULL;
+union EasyGenericData {
+    struct EasyTable table;
+    struct EasyList list;
+    struct EasyText text;
+    struct EasyInteger integer;
+    struct EasyFraction fraction;
+    enum EasyBoolean boolean;
+    EasyNothing nothing;
+};
+
+struct EasyGenericObject {
+    enum EasyGenericType type;
+    union EasyGenericData data;
+};
+
+/* NOTE These need to come after the EasyGenericObject */
+struct EasyTableItem {
+    enum EasyBoolean valid;
+    struct EasyGenericObject key;
+    struct EasyGenericObject value;
+};
 
 /*******************************************************************************
  *  GENERIC LIBRARY IMPLEMENTATION
@@ -225,60 +250,61 @@ EasyGenericType__print_json(enum EasyGenericType *me)
 void
 EasyTable__print_json(struct EasyTable *me)
 {
-    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    EASY_GUARD(me != NULL, "pointer must not be NULL");
     printf("{\"type\": \"EasyTable\", ...}");
 }
 
 void
 EasyList__print_json(struct EasyList *me)
 {
-    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    EASY_GUARD(me != NULL, "pointer must not be NULL");
     printf("{\"type\": \"EasyList\", ...}");
 }
 
 void
 EasyText__print_json(struct EasyText *me)
 {
-    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    EASY_GUARD(me != NULL, "pointer must not be NULL");
     printf("{\"type\": \"EasyText\", ...}");
 }
 
 void
 EasyInteger__print_json(struct EasyInteger *me)
 {
-    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    EASY_GUARD(me != NULL, "pointer must not be NULL");
     printf("{\"type\": \"EasyInteger\", ...}");
 }
 
 void
 EasyFraction__print_json(struct EasyFraction *me)
 {
-    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    EASY_GUARD(me != NULL, "pointer must not be NULL");
     printf("{\"type\": \"EasyFraction\", ...}");
 }
 
 void
 EasyBoolean__print_json(enum EasyBoolean *me)
 {
-    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    EASY_GUARD(me != NULL, "pointer must not be NULL");
     printf("{\"type\": \"EasyBoolean\", ...}");
 }
 
 void
 EasyNothing__print_json(EasyNothing *me)
 {
-    EASY_ASSERT(me != NULL, "pointer must not be NULL");
-    EASY_ASSERT(*me != NULL, "pointer must be NULL");
+    EASY_GUARD(me != NULL, "pointer must not be NULL");
+    EASY_GUARD(*me != NULL, "pointer must be NULL");
     printf("{\"type\": \"EasyNothing\", \"data\": \"%p\"}", *me);
 }
 
 void
 EasyGenericObject__print_json(struct EasyGenericObject *me)
 {
+    EASY_GUARD(me != NULL, "pointer must not be NULL");
     printf("{\"type\": \"EasyGenericObject\", \".type\": ");
     EasyGenericType__print_json(&me->type);
     printf(", \".data\": ");
-    switch (type) {
+    switch (me->type) {
     case EASY_TABLE_TYPE:
         EasyTable__print_json(&me->data.table);
         break;
@@ -305,3 +331,35 @@ EasyGenericObject__print_json(struct EasyGenericObject *me)
     }
     printf("}");
 }
+
+/* EasyInteger */
+/** Convert a C-style string to an EasyInteger. */
+struct EasyInteger
+EasyInteger__from_cstr(char const *str)
+{
+    struct EasyInteger me = {0};
+    size_t num_char = strlen(str);
+
+    switch (str[0]) {
+    case '+':
+        me.sign = POSITIVE;
+        break;
+    case '-':
+        me.sign = NEGATIVE;
+        break;
+    case '0':
+        EASY_ASSERT(num_char == 1, "the only valid string beginning with a '0' is \"0\"");
+        me.sign = ZERO;
+        me.data = EASY_ALLOC(1 * sizeof(char));
+        break;
+    default:
+        EASY_ASSERT(isdigit(str[0]), "the string must begin with \"[+-0-9]\"")
+        break;
+    }
+
+    for (size_t i = 0; i < num_char; ++i) {
+
+    }
+}
+
+#endif /* !__EASYLIB_H__ */
