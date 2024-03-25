@@ -187,3 +187,95 @@ const EasyNothing NOTHING = NULL;
 *******************************************************************************/
 
 /* TODO(dchu) */
+void
+EasyGenericType__print_json(enum EasyGenericType *me)
+{
+    switch (*me) {
+    case EASY_TABLE_TYPE:
+        printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_TABLE_TYPE\", \"number\": %d}", *me);
+        break;
+    case EASY_LIST_TYPE:
+        printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_LIST_TYPE\", \"number\": %d}", *me);
+        printf("EASY_LIST_TYPE");
+        break;
+    case EASY_TEXT_TYPE:
+        printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_TEXT_TYPE\", \"number\": %d}", *me);
+        printf("EASY_TEXT_TYPE");
+        break;
+    case EASY_INTEGER_TYPE:
+        printf("EASY_INTEGER_TYPE");
+        printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_INTEGER_TYPE\", \"number\": %d}", *me);
+        break;
+    case EASY_FRACTION_TYPE:
+        printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_FRACTION_TYPE\", \"number\": %d}", *me);
+        printf("EASY_FRACTION_TYPE");
+        break;
+    case EASY_BOOLEAN_TYPE:
+        printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_BOOLEAN_TYPE\", \"number\": %d}", *me);
+        printf("EASY_BOOLEAN_TYPE");
+        break;
+    case EASY_NOTHING_TYPE:
+        printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_NOTHING_TYPE\", \"number\": %d}", *me);
+        break;
+    default:
+        EASY_IMPOSSIBLE();
+    }
+}
+
+void
+EasyTable__print_json(struct EasyTable *me);
+
+void
+EasyList__print_json(struct EasyList *me);
+
+void
+EasyText__print_json(struct EasyText *me);
+
+void
+EasyInteger__print_json(struct EasyInteger *me);
+
+void
+EasyFraction__print_json(struct EasyFraction *me);
+
+void
+EasyBoolean__print_json(enum EasyBoolean *me);
+
+void
+EasyNothing__print_json(EasyNothing *me)
+{
+    printf("{\"type\": \"EasyNothing\"}");
+}
+
+void
+EasyGenericObject__print_json(struct EasyGenericObject *me)
+{
+    printf("{\"type\": \"EasyGenericObject\", \"mytype\": ");
+    EasyGenericType__print_json(&me->type);
+    printf(", \"data\": ");
+    switch (type) {
+    case EASY_TABLE_TYPE:
+        EasyTable__print_json(&me->data.table);
+        break;
+    case EASY_LIST_TYPE:
+        EasyList__print_json(&me->data.list);
+        break;
+    case EASY_TEXT_TYPE:
+        EasyText__print_json(&me->data.text);
+        break;
+    case EASY_INTEGER_TYPE:
+        EasyInteger__print_json(&me->data.integer);
+        break;
+    case EASY_FRACTION_TYPE:
+        EasyFraction__print_json(&me->data.fraction);
+        break;
+    case EASY_BOOLEAN_TYPE:
+        EasyBoolean__print_json(&me->data.boolean);
+        break;
+    case EASY_NOTHING_TYPE:
+        EasyNothing__print_json(&me->data.nothing);
+        break;
+    default:
+        EASY_IMPOSSIBLE();
+    }
+    printf("}");
+}
