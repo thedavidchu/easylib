@@ -69,6 +69,7 @@ easy_print_error(char *msg, char *file, int line)
 #define EASY_ASSERT(condition, msg) easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
 #define EASY_GUARD(condition, msg) easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
 #define EASY_IMPOSSIBLE() easy_assert(0, "impossible!", __FILE__, __LINE__)
+#define EASY_NOT_IMPLEMENTED() easy_assert(0, "impossible!", __FILE__, __LINE__)
 
 void
 easy_assert(int condition, char *msg, char *file, int line)
@@ -339,26 +340,63 @@ EasyInteger__from_cstr(char const *str)
 {
     struct EasyInteger me = {0};
     size_t num_char = strlen(str);
+    size_t start_i = 0;
+    size_t num_digits = 0;
 
     switch (str[0]) {
-    case '+':
-        me.sign = POSITIVE;
-        break;
-    case '-':
-        me.sign = NEGATIVE;
-        break;
     case '0':
         EASY_ASSERT(num_char == 1, "the only valid string beginning with a '0' is \"0\"");
         me.sign = ZERO;
-        me.data = EASY_ALLOC(1 * sizeof(char));
+        me.data = EASY_ALLOC(1, sizeof(char));
+        me.length = 1;
+        return;
+    case '-':
+        me.sign = NEGATIVE;
+        me.data = EASY_ALLOC(num_char - 1, sizeof(char));
+        me.length = num_char - 1;
+        start_i = 1;
+        num_digits = num_char - 1;
+        break;
+    case '+':
+        me.sign = POSITIVE;
+        me.data = EASY_ALLOC(num_char - 1, sizeof(char));
+        me.length = num_char - 1;
+        start_i = 1;
+        num_digits = num_char - 1;
         break;
     default:
         EASY_ASSERT(isdigit(str[0]), "the string must begin with \"[+-0-9]\"")
+        me.sign = POSITIVE;
+        me.data = EASY_ALLOC(num_char, sizeof(char));
+        me.length = num_char;
+        start_i = 0;
+        num_digits = num_char;
         break;
     }
 
-    for (size_t i = 0; i < num_char; ++i) {
+    for (size_t i = start_i; i < num_char; ++i) {
+        /* Flip digits */
+        me.data[num_digits - i] = str[i] - '0';
+    }
+    return me;
+}
 
+struct EasyInteger
+EasyInteger__add(struct EasyInteger *a, struct EasyInteger *b)
+{
+    EASY_GUARD(a != NULL && b != NULL, "inputs must be non-null");
+    if (a->sign == ZERO) {
+        // TODO
+        EASY_NOT_IMPLEMENTED();
+    } else if (b->sign == ZERO) {
+        // TODO
+        EASY_NOT_IMPLEMENTED();
+    } else if (a->sign == b->sign) {
+        // TODO
+        EASY_NOT_IMPLEMENTED();
+    } else {
+        // TODO
+        EASY_NOT_IMPLEMENTED();
     }
 }
 
