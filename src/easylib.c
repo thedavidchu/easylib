@@ -223,35 +223,61 @@ EasyGenericType__print_json(enum EasyGenericType *me)
 }
 
 void
-EasyTable__print_json(struct EasyTable *me);
+EasyTable__print_json(struct EasyTable *me)
+{
+    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    printf("{\"type\": \"EasyTable\", ...}");
+}
 
 void
-EasyList__print_json(struct EasyList *me);
+EasyList__print_json(struct EasyList *me)
+{
+    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    printf("{\"type\": \"EasyList\", ...}");
+}
 
 void
-EasyText__print_json(struct EasyText *me);
+EasyText__print_json(struct EasyText *me)
+{
+    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    printf("{\"type\": \"EasyText\", ...}");
+}
 
 void
-EasyInteger__print_json(struct EasyInteger *me);
+EasyInteger__print_json(struct EasyInteger *me)
+{
+    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    printf("{\"type\": \"EasyInteger\", ...}");
+}
 
 void
-EasyFraction__print_json(struct EasyFraction *me);
+EasyFraction__print_json(struct EasyFraction *me)
+{
+    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    printf("{\"type\": \"EasyFraction\", ...}");
+}
 
 void
-EasyBoolean__print_json(enum EasyBoolean *me);
+EasyBoolean__print_json(enum EasyBoolean *me)
+{
+    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    printf("{\"type\": \"EasyBoolean\", ...}");
+}
 
 void
 EasyNothing__print_json(EasyNothing *me)
 {
-    printf("{\"type\": \"EasyNothing\"}");
+    EASY_ASSERT(me != NULL, "pointer must not be NULL");
+    EASY_ASSERT(*me != NULL, "pointer must be NULL");
+    printf("{\"type\": \"EasyNothing\", \"data\": \"%p\"}", *me);
 }
 
 void
 EasyGenericObject__print_json(struct EasyGenericObject *me)
 {
-    printf("{\"type\": \"EasyGenericObject\", \"mytype\": ");
+    printf("{\"type\": \"EasyGenericObject\", \".type\": ");
     EasyGenericType__print_json(&me->type);
-    printf(", \"data\": ");
+    printf(", \".data\": ");
     switch (type) {
     case EASY_TABLE_TYPE:
         EasyTable__print_json(&me->data.table);
