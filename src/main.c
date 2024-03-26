@@ -53,7 +53,6 @@ test_integers(void)
     EasyInteger__destroy(&i);
 }
 
-
 int
 main(void)
 {
