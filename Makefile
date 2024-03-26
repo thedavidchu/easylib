@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -Werror -std=c99
+CFLAGS=-Wall -Wextra -Werror -pedantic -std=c99 -g
 
 SRCS=$(filter-out src/deprecated/%.c, $(shell find src -name "*.c"))
 HDRS=$(shell find src -name "*.h")
