@@ -132,6 +132,10 @@ void *easy_duplicate(void *src, size_t nmemb, size_t size) {
 
 /** Set all values within an object to zero. */
 #define EASY_SET_ZERO(ptr) memset(ptr, 0, sizeof(*ptr));
+#define EASY_SET_POINTER_ARRAY_ZERO(ptr, length) memset(ptr, 0, sizeof(*ptr) * (length))
+
+/** Get the reverse index. */
+#define EASY_REVERSE_INDEX(length, idx) ((length) - 1 - (idx))
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
@@ -354,8 +358,8 @@ void EasyGenericObject__print_json(struct EasyGenericObject *me) {
 /** Convert a C-style string to an EasyInteger. */
 struct EasyInteger EasyInteger__from_cstr(char const *str) {
   struct EasyInteger me = {0};
+  char const *digit_str = NULL;
   size_t num_char = strlen(str);
-  size_t start_i = 0;
   size_t num_digits = 0;
 
   switch (str[0]) {
@@ -364,20 +368,21 @@ struct EasyInteger EasyInteger__from_cstr(char const *str) {
                 "the only valid string beginning with a '0' is \"0\"");
     me.sign = ZERO;
     me.data = EASY_ALLOC(1, sizeof(char));
+    me.data[0] = 0;
     me.length = 1;
     return me;
   case '-':
     me.sign = NEGATIVE;
     me.data = EASY_ALLOC(num_char - 1, sizeof(char));
     me.length = num_char - 1;
-    start_i = 1;
+    digit_str = &str[1];
     num_digits = num_char - 1;
     break;
   case '+':
     me.sign = POSITIVE;
     me.data = EASY_ALLOC(num_char - 1, sizeof(char));
     me.length = num_char - 1;
-    start_i = 1;
+    digit_str = &str[1];
     num_digits = num_char - 1;
     break;
   default:
@@ -385,14 +390,15 @@ struct EasyInteger EasyInteger__from_cstr(char const *str) {
     me.sign = POSITIVE;
     me.data = EASY_ALLOC(num_char, sizeof(char));
     me.length = num_char;
-    start_i = 0;
+    digit_str = &str[0];
     num_digits = num_char;
     break;
   }
 
-  for (size_t i = start_i; i < num_char; ++i) {
+  for (size_t i = 0; i < num_digits; ++i) {
     /* Flip digits */
-    me.data[num_digits - i] = str[i] - '0';
+    EASY_GUARD(isdigit(digit_str[i]), "the string must begin with \"[0-9]\"");
+    me.data[num_digits - 1 - i] = digit_str[i] - '0';
   }
   return me;
 }
@@ -420,8 +426,8 @@ int compare_absolute_integer(struct EasyInteger *a, struct EasyInteger *b) {
   /* Starting from the most significant digit, work backwards until you find a
    * difference */
   for (size_t i = 0; i < a->length; ++i) {
-    uint8_t a_ = a->data[a->length - 1 - i];
-    uint8_t b_ = b->data[b->length - 1 - i];
+    uint8_t a_ = a->data[EASY_REVERSE_INDEX(a->length, i)];
+    uint8_t b_ = b->data[EASY_REVERSE_INDEX(b->length, i)];
 
     if (a_ > b_) {
       return 1;
@@ -440,11 +446,8 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
   EASY_GUARD(b != NULL && b->data != NULL, "inputs must be non-null");
   struct EasyInteger me = {0};
   if (a->sign == ZERO && b->sign == ZERO) {
-    me.sign = ZERO;
-    /* This EASY_ALLOC already sets the uninitialized memory to zero */
-    me.data = EASY_ALLOC(1, sizeof(*me.data));
-    me.length = 1;
-    return me;
+    /* This case could be subsumed by the next two cases */
+    return EasyInteger__from_cstr("0");
   } else if (a->sign == ZERO) {
     return EasyInteger__copy(b);
   } else if (b->sign == ZERO) {
@@ -482,10 +485,7 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
     struct EasyInteger *larger_int = NULL, *smaller_int = NULL;
     switch (compare_absolute_integer(a, b)) {
     case 0:
-      me.sign = ZERO;
-      me.data = EASY_ALLOC(1, sizeof(*me.data));
-      me.length = 1;
-      return me;
+      return EasyInteger__from_cstr("0");
     case -1:
       larger_int = b;
       smaller_int = a;
@@ -524,6 +524,57 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
     }
     return me;
   }
+}
+
+struct EasyInteger EasyInteger__multiply(struct EasyInteger *a, struct EasyInteger *b) {
+  EASY_GUARD(a != NULL && a->data != NULL, "inputs must be non-null");
+  EASY_GUARD(b != NULL && b->data != NULL, "inputs must be non-null");
+
+  struct EasyInteger me = {0};
+
+  if (a->sign == ZERO || b->sign == ZERO) {
+    return EasyInteger__from_cstr("0");
+  } else if (a->sign == b->sign) {
+    me.sign = POSITIVE;
+  } else {
+    me.sign = NEGATIVE;
+  }
+
+  const size_t max_ans_length = a->length + b->length;
+  /* Relies on the fact that it zeroes the array */
+  me.data = EASY_ALLOC(max_ans_length, sizeof(*me.data));
+  EASY_SET_POINTER_ARRAY_ZERO(me.data, max_ans_length);
+  for (size_t i = 0; i < a->length; ++i) {
+    for (size_t j = 0; j < b->length; ++j) {
+      signed char product = a->data[i] * b->data[j] + me.data[i + j];
+      if (product >= NUM_INTEGER_DIGITS) {
+        me.data[i + j] = product % NUM_INTEGER_DIGITS;
+        me.data[i + j + 1] += product / NUM_INTEGER_DIGITS;
+      } else {
+        me.data[i + j] = product;
+      }
+    }
+  }
+
+  /* Set length */
+  for (size_t i = 0; i < max_ans_length; ++i) {
+    size_t idx = EASY_REVERSE_INDEX(max_ans_length, i);
+    signed char digit = me.data[idx];
+    if (digit != 0) {
+      EASY_ASSERT(0 <= digit && digit < NUM_INTEGER_DIGITS, "must be in range");
+      me.length = idx + 1;
+      break;
+    }
+  }
+
+  /* Assert no overflows */
+  for (size_t i = 0; i < max_ans_length; ++i) {
+    size_t idx = EASY_REVERSE_INDEX(max_ans_length, i);
+    signed char digit = me.data[idx];
+    EASY_ASSERT(0 <= digit && digit < NUM_INTEGER_DIGITS, "must be in range");
+  }
+
+  return me;
 }
 
 void EasyInteger__print(struct EasyInteger *me) {

@@ -39,6 +39,18 @@ void test_integers(void) {
   EasyInteger__print(&i);
   printf("\n");
 
+  /* Test simple multiplication */
+  struct EasyInteger j = EasyInteger__from_cstr("9999");
+  struct EasyInteger k = EasyInteger__from_cstr("99");
+  struct EasyInteger l = EasyInteger__multiply(&j, &k);
+
+  EasyInteger__print(&j);
+  printf(" * ");
+  EasyInteger__print(&k);
+  printf(" = ");
+  EasyInteger__print(&l);
+  printf("\n");
+
   /* Destroy all integers */
   EasyInteger__destroy(&a);
   EasyInteger__destroy(&b);
@@ -49,6 +61,9 @@ void test_integers(void) {
   EasyInteger__destroy(&g);
   EasyInteger__destroy(&h);
   EasyInteger__destroy(&i);
+  EasyInteger__destroy(&j);
+  EasyInteger__destroy(&k);
+  EasyInteger__destroy(&l);
 }
 
 int main(void) {
