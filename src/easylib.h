@@ -16,7 +16,7 @@
  *
  *  1. Needless to say, correctness trumps all
  *      - No segmentation faults, floating point exception errors, or integer
- *overflow
+ *        overflow
  *      - OK to exit with error (see #5)
  *  2. Simplicity over performance
  *  3. Data types are constant unless explicitly marked as "Mutable"
@@ -31,7 +31,7 @@
  *  2. Recursively Destroy
  *  3. Recursively Pretty Print (c.f. Python's str(...) function)
  *      - In later versions, we will require implementing functions to convert
- *to a C-style string or an EasyText object
+ *        to a C-style string or an EasyText object
  *  4. Recursively Debug Print (c.f. Python's repr(...) function)
  *  5. Recursively Hash
  *  6. Recursively Compare If Equal
@@ -74,7 +74,8 @@ void easy_print_error(char *msg, char *file, int line) {
 #define EASY_GUARD(condition, msg)                                             \
   easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
 #define EASY_IMPOSSIBLE() easy_assert(0, "impossible!", __FILE__, __LINE__)
-#define EASY_NOT_IMPLEMENTED() easy_assert(0, "not implemented!", __FILE__, __LINE__)
+#define EASY_NOT_IMPLEMENTED()                                                 \
+  easy_assert(0, "not implemented!", __FILE__, __LINE__)
 
 void easy_assert(int condition, char *msg, char *file, int line) {
   if (!condition) {
@@ -166,7 +167,10 @@ struct EasyList {
 };
 
 /* EasyBoolean */
-enum EasyBoolean { FALSE = 0, TRUE = 1 }; /* We want this to behave as a normal boolean */
+enum EasyBoolean {
+  FALSE = 0,
+  TRUE = 1
+}; /* We want this to behave as a normal boolean */
 
 /* EasyNothing */
 const EasyNothing NOTHING = NULL;
@@ -404,8 +408,7 @@ struct EasyInteger EasyInteger__copy(struct EasyInteger *me) {
 #define NUM_INTEGER_DIGITS 10
 
 /** Helper function to find the larger absolute value */
-int compare_absolute_integer(struct EasyInteger *a, struct EasyInteger *b)
-{
+int compare_absolute_integer(struct EasyInteger *a, struct EasyInteger *b) {
   EASY_GUARD(a != NULL && a->data != NULL, "inputs must be non-null");
   EASY_GUARD(b != NULL && b->data != NULL, "inputs must be non-null");
   if (a->length > b->length) {
@@ -414,7 +417,8 @@ int compare_absolute_integer(struct EasyInteger *a, struct EasyInteger *b)
     return -1;
   }
 
-  /* Starting from the most significant digit, work backwards until you find a difference */
+  /* Starting from the most significant digit, work backwards until you find a
+   * difference */
   for (size_t i = 0; i < a->length; ++i) {
     uint8_t a_ = a->data[a->length - 1 - i];
     uint8_t b_ = b->data[b->length - 1 - i];
@@ -448,9 +452,9 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
   } else if (a->sign == b->sign) {
     size_t max_ans_length = MAX(a->length, b->length) + 1;
 
-    me.sign = a->sign;  /* Sign matches both a and b */
+    me.sign = a->sign; /* Sign matches both a and b */
     me.data = EASY_ALLOC(max_ans_length, sizeof(*me.data));
-    me.length = 0;  /* This will be iteratively lengthened */
+    me.length = 0; /* This will be iteratively lengthened */
     signed char carry = 0;
     /* Importantly, max_ans_length > MAX(a->length, b->length)! */
     for (size_t i = 0; i < max_ans_length; ++i) {
@@ -473,14 +477,8 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
   } else {
     size_t max_ans_length = MAX(a->length, b->length);
     me.data = EASY_ALLOC(max_ans_length, sizeof(*me.data));
-    me.length = 0;  /* This will be iteratively lengthened */
-    /* Algorithm
-     * =========
-     * 
-     * 1. Find larger absolute
-     * 2. Take the sign of the larger absolute (unless they are equal)
-     * 3. Subtract with borrow
-     */
+    me.length = 0; /* This will be iteratively lengthened */
+
     struct EasyInteger *larger_int = NULL, *smaller_int = NULL;
     switch (compare_absolute_integer(a, b)) {
     case 0:
@@ -521,7 +519,8 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
       if (me.data[i] > 0) {
         me.length = i + 1;
       }
-      EASY_ASSERT(0 <= me.data[i] && me.data[i] < NUM_INTEGER_DIGITS, "digits must be in range!");
+      EASY_ASSERT(0 <= me.data[i] && me.data[i] < NUM_INTEGER_DIGITS,
+                  "digits must be in range!");
     }
     return me;
   }
@@ -529,7 +528,6 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
 
 void EasyInteger__print(struct EasyInteger *me) {
   EASY_GUARD(me != NULL && me->data != NULL, "input should be non-null");
-  
   if (me->sign == NEGATIVE) {
     printf("-");
   }
@@ -541,7 +539,7 @@ void EasyInteger__print(struct EasyInteger *me) {
 void EasyInteger__destroy(struct EasyInteger *me) {
   EASY_GUARD(me != NULL && me->data != NULL, "input should be non-null");
   EASY_FREE(me->data);
-  
+
   EASY_SET_ZERO(me);
 }
 
