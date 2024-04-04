@@ -48,97 +48,15 @@
  ******************************************************************************/
 
 #pragma once
-#ifndef __EASYLIB_H__
-#define __EASYLIB_H__
+#ifndef EASYLIB_H
+#define EASYLIB_H
 
-#include <ctype.h>
-#include <limits.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/*******************************************************************************
- *  COMMON FUNCTIONS
- ******************************************************************************/
-void easy_print_error(char *msg, char *file, int line) {
-  fprintf(stderr, "Error [%s:%d]: %s\n", file, line, msg);
-}
-
-/* We explicitly convert the condition to an int so that it will not cause
- * problems for the function call */
-#define EASY_ASSERT(condition, msg)                                            \
-  easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
-/** Guard against erroneous inputs */
-#define EASY_GUARD(condition, msg)                                             \
-  easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
-#define EASY_IMPOSSIBLE() easy_assert(0, "impossible!", __FILE__, __LINE__)
-#define EASY_NOT_IMPLEMENTED()                                                 \
-  easy_assert(0, "not implemented!", __FILE__, __LINE__)
-
-void easy_assert(int condition, char *msg, char *file, int line) {
-  if (!condition) {
-    easy_print_error(msg, file, line);
-    exit(EXIT_FAILURE);
-  }
-}
-
-#define EASY_ALLOC(nmemb, size) easy_alloc(nmemb, size, __FILE__, __LINE__)
-#define EASY_REALLOC(ptr, nmemb, size)                                         \
-  easy_realloc(ptr, nmemb, size, __FILE__, __LINE__)
-#define EASY_FREE(ptr) easy_free(ptr, __FILE__, __LINE__)
-
-void *easy_alloc(size_t nmemb, size_t size, char *file, int line) {
-  void *ptr = calloc(nmemb, size);
-  if (ptr == NULL) {
-    easy_print_error("out of memory", file, line);
-    exit(EXIT_FAILURE);
-  }
-  return ptr;
-}
-
-void *easy_realloc(void *ptr, size_t nmemb, size_t size, char *file, int line) {
-  EASY_GUARD(nmemb > 0 && size > 0, "nmemb and size should be positive");
-  EASY_GUARD(nmemb > SIZE_MAX / size, "overflow");
-  const size_t new_size = nmemb * size;
-  void *new_ptr = realloc(ptr, new_size);
-  if (new_ptr == NULL && new_size > 0) { /* What if new_size == 0? */
-    easy_print_error("out of memory", file, line);
-    exit(EXIT_FAILURE);
-  }
-  return new_ptr;
-}
-
-void easy_free(void *ptr, char *file, int line) {
-  if (ptr == NULL) {
-    easy_print_error("freeing null pointer", file, line);
-    exit(EXIT_FAILURE);
-  }
-  free(ptr);
-}
-
-#define EASY_DUPLICATE(src, nmemb, size) easy_duplicate(src, nmemb, size)
-
-void *easy_duplicate(void *src, size_t nmemb, size_t size) {
-  EASY_GUARD(nmemb > 0 && size > 0, "nmemb and size should be positive");
-  EASY_GUARD(nmemb > SIZE_MAX / size, "overflow");
-  const size_t new_size = nmemb * size;
-  void *dst = EASY_ALLOC(nmemb, size);
-  void *tmp_dst = memcpy(dst, src, new_size);
-  EASY_ASSERT(tmp_dst == dst, "tmp_dst and dst must match!");
-  return dst;
-}
-
-/** Set all values within an object to zero. */
-#define EASY_SET_ZERO(ptr) memset(ptr, 0, sizeof(*ptr));
-#define EASY_SET_POINTER_ARRAY_ZERO(ptr, length) memset(ptr, 0, sizeof(*ptr) * (length))
-
-/** Get the reverse index. */
-#define EASY_REVERSE_INDEX(length, idx) ((length) - 1 - (idx))
-
-#define MAX(x, y) ((x) > (y) ? (x) : (y))
-#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#include "easycommon.h"
 
 /*******************************************************************************
  *  GENERIC LIBRARY DATA STRUCTURES
@@ -594,4 +512,4 @@ void EasyInteger__destroy(struct EasyInteger *me) {
   EASY_SET_ZERO(me);
 }
 
-#endif /* !__EASYLIB_H__ */
+#endif /* !EASYLIB_H */
