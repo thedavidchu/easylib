@@ -2,12 +2,28 @@
 
 #include <stdio.h>
 
+#include "easyboolean.h"
 #include "easyinteger.h"
 #include "easylib.h"
 #include "easytext.h"
 
 void print_green_ok(void) {
   printf("\033[32m--- OK ---\n\033[0m");
+}
+
+void test_easy_boolean(void) {
+  enum EasyBoolean a = TRUE;
+  enum EasyBoolean b = FALSE;
+
+  EasyBoolean__print(&a);
+  printf("\n");
+  EasyBoolean__print(&b);
+  printf("\n");
+
+  EasyBoolean__print_json(&a);
+  printf("\n");
+  EasyBoolean__print_json(&b);
+  printf("\n");
 }
 
 void test_easy_integer(void) {
@@ -119,6 +135,8 @@ void test_easy_text(void) {
 }
 
 int main(void) {
+  test_easy_boolean();
+  print_green_ok();
   test_easy_integer();
   print_green_ok();
   test_easy_text();
