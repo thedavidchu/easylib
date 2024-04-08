@@ -97,13 +97,8 @@ enum EasyBoolean {
 /* EasyNothing */
 const EasyNothing NOTHING = NULL;
 
-/* EasyText */
-struct EasyText {
-  char *data;
-  size_t length; /* Not including the NIL byte at the end */
-};
-
 #include "easyinteger.h"
+#include "easytext.h"
 
 /* EasyFraction */
 struct EasyFraction {
@@ -148,7 +143,6 @@ struct EasyTableItem {
  *  GENERIC LIBRARY IMPLEMENTATION
  ******************************************************************************/
 
-/* TODO(dchu) */
 void EasyGenericType__print_json(enum EasyGenericType *me) {
   switch (*me) {
   case EASY_TABLE_TYPE:
@@ -196,6 +190,7 @@ void EasyGenericType__print_json(enum EasyGenericType *me) {
   }
 }
 
+/* TODO(dchu) */
 void EasyTable__print_json(struct EasyTable *me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   printf("{\"type\": \"EasyTable\", ...}");
@@ -204,16 +199,6 @@ void EasyTable__print_json(struct EasyTable *me) {
 void EasyList__print_json(struct EasyList *me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   printf("{\"type\": \"EasyList\", ...}");
-}
-
-void EasyText__print_json(struct EasyText *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  printf("{\"type\": \"EasyText\", ...}");
-}
-
-void EasyInteger__print_json(struct EasyInteger *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  printf("{\"type\": \"EasyInteger\", ...}");
 }
 
 void EasyFraction__print_json(struct EasyFraction *me) {
@@ -263,6 +248,35 @@ void EasyGenericObject__print_json(struct EasyGenericObject *me) {
     EASY_IMPOSSIBLE();
   }
   printf("}");
+}
+
+void EasyGenericObject__print(struct EasyGenericObject *me) {
+  EASY_GUARD(me != NULL, "pointer must not be NULL");
+  switch (me->type) {
+  case EASY_TABLE_TYPE:
+    // EasyTable__print(&me->data.table);
+    break;
+  case EASY_LIST_TYPE:
+    // EasyList__print(&me->data.list);
+    break;
+  case EASY_TEXT_TYPE:
+    EasyText__print(&me->data.text);
+    break;
+  case EASY_INTEGER_TYPE:
+    // EasyInteger__print(&me->data.integer);
+    break;
+  case EASY_FRACTION_TYPE:
+    // EasyFraction__print(&me->data.fraction);
+    // break;
+  case EASY_BOOLEAN_TYPE:
+    // EasyBoolean__print(&me->data.boolean);
+    break;
+  case EASY_NOTHING_TYPE:
+    // EasyNothing__print(&me->data.nothing);
+    break;
+  default:
+    EASY_IMPOSSIBLE();
+  }
 }
 
 #endif /* !EASYLIB_H */

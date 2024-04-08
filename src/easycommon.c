@@ -57,9 +57,10 @@ void _easy_free(void *ptr, char *file, int line) {
  *  MEMORY MANIPULATION
  ******************************************************************************/
 
-void *_easy_duplicate(void *src, size_t nmemb, size_t size) {
+void *_easy_duplicate(void const *const src, size_t const nmemb,
+                      size_t const size) {
   EASY_GUARD(nmemb > 0 && size > 0, "nmemb and size should be positive");
-  EASY_GUARD(nmemb > SIZE_MAX / size, "overflow");
+  EASY_GUARD(nmemb < SIZE_MAX / size, "overflow");
   const size_t new_size = nmemb * size;
   void *dst = EASY_CALLOC(nmemb, size);
   void *tmp_dst = memcpy(dst, src, new_size);

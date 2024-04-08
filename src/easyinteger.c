@@ -2,6 +2,8 @@
 
 #include <ctype.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "easycommon.h"
@@ -238,6 +240,17 @@ void EasyInteger__print(struct EasyInteger *me) {
   for (size_t i = 0; i < me->length; ++i) {
     printf("%c", '0' + me->data[me->length - 1 - i]);
   }
+}
+
+void EasyInteger__print_json(struct EasyInteger *me) {
+  EASY_GUARD(me != NULL, "pointer must not be NULL");
+  printf("{\"type\": \"EasyInteger\", \".sign\": %d, \".data\": ", me->sign);
+  /* NOTE This isn't guaranteed to be printed in such an easily readable
+   *      form! In future, I may just print the raw array. */
+  for (size_t i = 0; i < me->length; ++i) {
+    printf("%d", me->data[EASY_REVERSE_INDEX(me->length, i)]);
+  }
+  printf(", \".length\": %zu}", me->length);
 }
 
 void EasyInteger__destroy(struct EasyInteger *me) {

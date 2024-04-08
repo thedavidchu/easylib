@@ -37,6 +37,7 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
 struct EasyInteger EasyInteger__multiply(struct EasyInteger *a,
                                          struct EasyInteger *b);
 void EasyInteger__print(struct EasyInteger *me);
+void EasyInteger__print_json(struct EasyInteger *me);
 void EasyInteger__destroy(struct EasyInteger *me);
 
 #endif /* !EASYINTEGER_H */

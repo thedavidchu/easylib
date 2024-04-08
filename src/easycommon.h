@@ -27,7 +27,7 @@ void _easy_assert(int condition, char *msg, char *file, int line);
  *  MEMORY MANAGEMENT
  ******************************************************************************/
 
-/** Allocate potentially uninitialized memory. 
+/** Allocate potentially uninitialized memory.
  *  NOTE    I return memory initialized to zero, but I do not guarantee that
  *          this is the case!
  */
@@ -49,18 +49,20 @@ void _easy_free(void *ptr, char *file, int line);
 
 #define EASY_DUPLICATE(src, nmemb, size) _easy_duplicate(src, nmemb, size)
 
-void *_easy_duplicate(void *src, size_t nmemb, size_t size);
+void *_easy_duplicate(void const *const src, size_t const nmemb,
+                      size_t const size);
 
 /** Set all values within an object to zero. */
 #define EASY_SET_ZERO(ptr) memset(ptr, 0, sizeof(*ptr));
-#define EASY_SET_POINTER_ARRAY_ZERO(ptr, length) memset(ptr, 0, sizeof(*ptr) * (length))
+#define EASY_SET_POINTER_ARRAY_ZERO(ptr, length)                               \
+  memset(ptr, 0, sizeof(*ptr) * (length))
 
 /*******************************************************************************
  *  MISCELLANEOUS
  ******************************************************************************/
 
 /** Get the reverse index of an array. */
-#define EASY_REVERSE_INDEX(length, idx) ((length) - 1 - (idx))
+#define EASY_REVERSE_INDEX(length, idx) ((length)-1 - (idx))
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
