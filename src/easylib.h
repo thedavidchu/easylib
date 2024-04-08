@@ -88,15 +88,10 @@ struct EasyList {
   size_t length;
 };
 
-/* EasyBoolean */
-enum EasyBoolean {
-  FALSE = 0,
-  TRUE = 1
-}; /* We want this to behave as a normal boolean */
-
 /* EasyNothing */
 const EasyNothing NOTHING = NULL;
 
+#include "easyboolean.h"
 #include "easyinteger.h"
 #include "easytext.h"
 
@@ -206,11 +201,6 @@ void EasyFraction__print_json(struct EasyFraction *me) {
   printf("{\"type\": \"EasyFraction\", ...}");
 }
 
-void EasyBoolean__print_json(enum EasyBoolean *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  printf("{\"type\": \"EasyBoolean\", ...}");
-}
-
 void EasyNothing__print_json(EasyNothing *me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   EASY_GUARD(*me != NULL, "pointer must be NULL");
@@ -263,13 +253,13 @@ void EasyGenericObject__print(struct EasyGenericObject *me) {
     EasyText__print(&me->data.text);
     break;
   case EASY_INTEGER_TYPE:
-    // EasyInteger__print(&me->data.integer);
+    EasyInteger__print(&me->data.integer);
     break;
   case EASY_FRACTION_TYPE:
     // EasyFraction__print(&me->data.fraction);
     // break;
   case EASY_BOOLEAN_TYPE:
-    // EasyBoolean__print(&me->data.boolean);
+    EasyBoolean__print(&me->data.boolean);
     break;
   case EASY_NOTHING_TYPE:
     // EasyNothing__print(&me->data.nothing);
