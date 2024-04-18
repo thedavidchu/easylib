@@ -146,8 +146,6 @@ void EasyGenericObject__print(struct EasyGenericObject *me) ;
 
 struct EasyTable EasyTable__copy(struct EasyTable *me) ;
 
-struct EasyList EasyList__copy(struct EasyList *me) ;
-
 struct EasyText EasyText__copy(struct EasyText *me) ;
 
 struct EasyFraction EasyFraction__copy(struct EasyFraction *me) ;

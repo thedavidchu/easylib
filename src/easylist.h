@@ -11,6 +11,7 @@ struct EasyList {
 
 struct EasyList EasyList__new_empty();
 struct EasyList EasyList__append(struct EasyList *me, struct EasyGenericObject *obj);
+struct EasyList EasyList__copy(struct EasyList *me) ;
 void EasyList__destroy(struct EasyList *me);
 
 void EasyList__print(struct EasyList *me);
