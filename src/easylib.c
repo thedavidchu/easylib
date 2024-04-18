@@ -3,7 +3,6 @@
 #include "easycommon.h"
 #include "easyinteger.h"
 
-
 void EasyGenericType__print_json(enum EasyGenericType *me) {
   switch (*me) {
   case EASY_TABLE_TYPE:
@@ -186,16 +185,16 @@ struct EasyGenericObject EasyGenericObject__copy(struct EasyGenericObject *me) {
 }
 
 void EasyTable__destroy(struct EasyTable *me) {
-    /* TODO */
-    (void)me;
-    EASY_ASSERT(0, "TODO");
-    return;
+  /* TODO */
+  (void)me;
+  EASY_ASSERT(0, "TODO");
+  return;
 }
 
 void EasyFraction__destroy(struct EasyFraction *me) {
-    EasyInteger__destroy(&me->numerator);
-    EasyInteger__destroy(&me->denominator);
-    *me = (struct EasyFraction){0};
+  EasyInteger__destroy(&me->numerator);
+  EasyInteger__destroy(&me->denominator);
+  *me = (struct EasyFraction){0};
 }
 
 void EasyNothing__destroy(EasyNothing *me) {

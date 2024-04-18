@@ -5,12 +5,10 @@
 #include "easyboolean.h"
 #include "easyinteger.h"
 #include "easylib.h"
-#include "easytext.h"
 #include "easylist.h"
+#include "easytext.h"
 
-void print_green_ok(void) {
-  printf("\033[32m--- OK ---\n\033[0m");
-}
+void print_green_ok(void) { printf("\033[32m--- OK ---\n\033[0m"); }
 
 void test_easy_boolean(void) {
   enum EasyBoolean a = TRUE;
@@ -125,20 +123,21 @@ void test_easy_text(void) {
       226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240,
       241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255,
       '\0'};
-    struct EasyText b = EasyText__from_cstr((char *)all_char);
-    EasyText__print(&b);
-    printf("\n");
-    EasyText__print_json(&b);
-    printf("\n");
+  struct EasyText b = EasyText__from_cstr((char *)all_char);
+  EasyText__print(&b);
+  printf("\n");
+  EasyText__print_json(&b);
+  printf("\n");
 
-    EasyText__destroy(&a);
-    EasyText__destroy(&b);
+  EasyText__destroy(&a);
+  EasyText__destroy(&b);
 }
 
 void test_easy_list(void) {
   struct EasyList a = EasyList__new_empty();
   struct EasyInteger x = EasyInteger__from_cstr("10");
-  struct EasyGenericObject y = {.type = EASY_INTEGER_TYPE, .data = {.integer = x}};
+  struct EasyGenericObject y = {.type = EASY_INTEGER_TYPE,
+                                .data = {.integer = x}};
   struct EasyList b = EasyList__append(&a, &y);
 
   EasyList__print(&a);

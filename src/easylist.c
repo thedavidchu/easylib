@@ -26,8 +26,7 @@ struct EasyList EasyList__append(struct EasyList *me,
 
 struct EasyList EasyList__copy(struct EasyList *me) {
   struct EasyList new_item = {
-      .data = EASY_CALLOC(me->length, sizeof(*me->data)),
-      .length = me->length};
+      .data = EASY_CALLOC(me->length, sizeof(*me->data)), .length = me->length};
   /* Recursively copy data */
   for (size_t i = 0; i < me->length; ++i) {
     new_item.data[i] = EasyGenericObject__copy(&me->data[i]);
@@ -36,12 +35,12 @@ struct EasyList EasyList__copy(struct EasyList *me) {
 }
 
 void EasyList__destroy(struct EasyList *me) {
-    EASY_GUARD(me != NULL && me->data != NULL, "ptr must not be NULL");
-    for (size_t i = 0; i < me->length; ++i) {
-        EasyGenericObject__destroy(&me->data[i]);
-    }
-    EASY_FREE(me->data);
-    *me = (struct EasyList){0};
+  EASY_GUARD(me != NULL && me->data != NULL, "ptr must not be NULL");
+  for (size_t i = 0; i < me->length; ++i) {
+    EasyGenericObject__destroy(&me->data[i]);
+  }
+  EASY_FREE(me->data);
+  *me = (struct EasyList){0};
 }
 
 void EasyList__print(struct EasyList *me) {

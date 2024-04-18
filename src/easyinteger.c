@@ -69,7 +69,8 @@ struct EasyInteger EasyInteger__copy(struct EasyInteger *me) {
 #define NUM_INTEGER_DIGITS 10
 
 /** Helper function to find the larger absolute value */
-static int compare_absolute_integer(struct EasyInteger *a, struct EasyInteger *b) {
+static int compare_absolute_integer(struct EasyInteger *a,
+                                    struct EasyInteger *b) {
   EASY_GUARD(a != NULL && a->data != NULL, "inputs must be non-null");
   EASY_GUARD(b != NULL && b->data != NULL, "inputs must be non-null");
   if (a->length > b->length) {
@@ -181,7 +182,8 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
   }
 }
 
-struct EasyInteger EasyInteger__multiply(struct EasyInteger *a, struct EasyInteger *b) {
+struct EasyInteger EasyInteger__multiply(struct EasyInteger *a,
+                                         struct EasyInteger *b) {
   EASY_GUARD(a != NULL && a->data != NULL, "inputs must be non-null");
   EASY_GUARD(b != NULL && b->data != NULL, "inputs must be non-null");
 

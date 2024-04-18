@@ -6,7 +6,7 @@ enum EasyBoolean {
   TRUE = 1
 }; /* We want this to behave as a normal boolean */
 
-enum EasyBoolean EasyBoolean__copy(enum EasyBoolean *me) ;
+enum EasyBoolean EasyBoolean__copy(enum EasyBoolean *me);
 
 void EasyBoolean__print(enum EasyBoolean *me);
 void EasyBoolean__print_json(enum EasyBoolean *me);

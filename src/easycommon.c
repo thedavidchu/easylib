@@ -33,7 +33,8 @@ void *_easy_calloc(size_t nmemb, size_t size, char *file, int line) {
   return ptr;
 }
 
-void *_easy_realloc(void *ptr, size_t nmemb, size_t size, char *file, int line) {
+void *_easy_realloc(void *ptr, size_t nmemb, size_t size, char *file,
+                    int line) {
   EASY_GUARD(nmemb > 0 && size > 0, "nmemb and size should be positive");
   EASY_GUARD(nmemb > SIZE_MAX / size, "overflow");
   const size_t new_size = nmemb * size;

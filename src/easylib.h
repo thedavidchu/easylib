@@ -56,8 +56,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "easycommon.h"
-
 /*******************************************************************************
  *  GENERIC LIBRARY DATA STRUCTURES
  ******************************************************************************/
@@ -136,22 +134,22 @@ struct EasyTableItem {
 void EasyGenericType__print_json(enum EasyGenericType *me);
 void EasyTable__print_json(struct EasyTable *me);
 
-void EasyFraction__print_json(struct EasyFraction *me) ;
+void EasyFraction__print_json(struct EasyFraction *me);
 
-void EasyNothing__print_json(EasyNothing *me) ;
+void EasyNothing__print_json(EasyNothing *me);
 
-void EasyGenericObject__print_json(struct EasyGenericObject *me) ;
+void EasyGenericObject__print_json(struct EasyGenericObject *me);
 
-void EasyGenericObject__print(struct EasyGenericObject *me) ;
+void EasyGenericObject__print(struct EasyGenericObject *me);
 
-struct EasyTable EasyTable__copy(struct EasyTable *me) ;
+struct EasyTable EasyTable__copy(struct EasyTable *me);
 
-struct EasyFraction EasyFraction__copy(struct EasyFraction *me) ;
+struct EasyFraction EasyFraction__copy(struct EasyFraction *me);
 
-EasyNothing EasyNothing__copy(EasyNothing *me) ;
+EasyNothing EasyNothing__copy(EasyNothing *me);
 
-struct EasyGenericObject EasyGenericObject__copy(struct EasyGenericObject *me) ;
+struct EasyGenericObject EasyGenericObject__copy(struct EasyGenericObject *me);
 
-void EasyGenericObject__destroy(struct EasyGenericObject *me) ;
+void EasyGenericObject__destroy(struct EasyGenericObject *me);
 
 #endif /* !EASYLIB_H */
