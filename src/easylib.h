@@ -82,17 +82,12 @@ struct EasyTable {
   size_t capacity; /* The maximum number of elements in the EasyTable */
 };
 
-/* EasyList */
-struct EasyList {
-  struct EasyGenericObject *data;
-  size_t length;
-};
-
 /* EasyNothing */
-const EasyNothing NOTHING = NULL;
+static const EasyNothing NOTHING = NULL;
 
 #include "easyboolean.h"
 #include "easyinteger.h"
+#include "easylist.h"
 #include "easytext.h"
 
 /* EasyFraction */
@@ -138,135 +133,31 @@ struct EasyTableItem {
  *  GENERIC LIBRARY IMPLEMENTATION
  ******************************************************************************/
 
-void EasyGenericType__print_json(enum EasyGenericType *me) {
-  switch (*me) {
-  case EASY_TABLE_TYPE:
-    printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_TABLE_TYPE\", "
-           "\"number\": %d}",
-           *me);
-    break;
-  case EASY_LIST_TYPE:
-    printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_LIST_TYPE\", "
-           "\"number\": %d}",
-           *me);
-    printf("EASY_LIST_TYPE");
-    break;
-  case EASY_TEXT_TYPE:
-    printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_TEXT_TYPE\", "
-           "\"number\": %d}",
-           *me);
-    printf("EASY_TEXT_TYPE");
-    break;
-  case EASY_INTEGER_TYPE:
-    printf("EASY_INTEGER_TYPE");
-    printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_INTEGER_TYPE\", "
-           "\"number\": %d}",
-           *me);
-    break;
-  case EASY_FRACTION_TYPE:
-    printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_FRACTION_TYPE\", "
-           "\"number\": %d}",
-           *me);
-    printf("EASY_FRACTION_TYPE");
-    break;
-  case EASY_BOOLEAN_TYPE:
-    printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_BOOLEAN_TYPE\", "
-           "\"number\": %d}",
-           *me);
-    printf("EASY_BOOLEAN_TYPE");
-    break;
-  case EASY_NOTHING_TYPE:
-    printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_NOTHING_TYPE\", "
-           "\"number\": %d}",
-           *me);
-    break;
-  default:
-    EASY_IMPOSSIBLE();
-  }
-}
+void EasyGenericType__print_json(enum EasyGenericType *me);
+void EasyTable__print_json(struct EasyTable *me);
 
-/* TODO(dchu) */
-void EasyTable__print_json(struct EasyTable *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  printf("{\"type\": \"EasyTable\", ...}");
-}
+void EasyFraction__print_json(struct EasyFraction *me) ;
 
-void EasyList__print_json(struct EasyList *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  printf("{\"type\": \"EasyList\", ...}");
-}
+void EasyNothing__print_json(EasyNothing *me) ;
 
-void EasyFraction__print_json(struct EasyFraction *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  printf("{\"type\": \"EasyFraction\", ...}");
-}
+void EasyGenericObject__print_json(struct EasyGenericObject *me) ;
 
-void EasyNothing__print_json(EasyNothing *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  EASY_GUARD(*me != NULL, "pointer must be NULL");
-  printf("{\"type\": \"EasyNothing\", \"data\": \"%p\"}", *me);
-}
+void EasyGenericObject__print(struct EasyGenericObject *me) ;
 
-void EasyGenericObject__print_json(struct EasyGenericObject *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  printf("{\"type\": \"EasyGenericObject\", \".type\": ");
-  EasyGenericType__print_json(&me->type);
-  printf(", \".data\": ");
-  switch (me->type) {
-  case EASY_TABLE_TYPE:
-    EasyTable__print_json(&me->data.table);
-    break;
-  case EASY_LIST_TYPE:
-    EasyList__print_json(&me->data.list);
-    break;
-  case EASY_TEXT_TYPE:
-    EasyText__print_json(&me->data.text);
-    break;
-  case EASY_INTEGER_TYPE:
-    EasyInteger__print_json(&me->data.integer);
-    break;
-  case EASY_FRACTION_TYPE:
-    EasyFraction__print_json(&me->data.fraction);
-    break;
-  case EASY_BOOLEAN_TYPE:
-    EasyBoolean__print_json(&me->data.boolean);
-    break;
-  case EASY_NOTHING_TYPE:
-    EasyNothing__print_json(&me->data.nothing);
-    break;
-  default:
-    EASY_IMPOSSIBLE();
-  }
-  printf("}");
-}
+struct EasyTable EasyTable__copy(struct EasyTable *me) ;
 
-void EasyGenericObject__print(struct EasyGenericObject *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  switch (me->type) {
-  case EASY_TABLE_TYPE:
-    // EasyTable__print(&me->data.table);
-    break;
-  case EASY_LIST_TYPE:
-    // EasyList__print(&me->data.list);
-    break;
-  case EASY_TEXT_TYPE:
-    EasyText__print(&me->data.text);
-    break;
-  case EASY_INTEGER_TYPE:
-    EasyInteger__print(&me->data.integer);
-    break;
-  case EASY_FRACTION_TYPE:
-    // EasyFraction__print(&me->data.fraction);
-    // break;
-  case EASY_BOOLEAN_TYPE:
-    EasyBoolean__print(&me->data.boolean);
-    break;
-  case EASY_NOTHING_TYPE:
-    // EasyNothing__print(&me->data.nothing);
-    break;
-  default:
-    EASY_IMPOSSIBLE();
-  }
-}
+struct EasyList EasyList__copy(struct EasyList *me) ;
+
+struct EasyText EasyText__copy(struct EasyText *me) ;
+
+struct EasyFraction EasyFraction__copy(struct EasyFraction *me) ;
+
+enum EasyBoolean EasyBoolean__copy(enum EasyBoolean *me) ;
+
+EasyNothing EasyNothing__copy(EasyNothing *me) ;
+
+struct EasyGenericObject EasyGenericObject__copy(struct EasyGenericObject *me) ;
+
+void EasyGenericObject__destroy(struct EasyGenericObject *me) ;
 
 #endif /* !EASYLIB_H */

@@ -6,6 +6,7 @@
 #include "easyinteger.h"
 #include "easylib.h"
 #include "easytext.h"
+#include "easylist.h"
 
 void print_green_ok(void) {
   printf("\033[32m--- OK ---\n\033[0m");
@@ -134,12 +135,34 @@ void test_easy_text(void) {
     EasyText__destroy(&b);
 }
 
+void test_easy_list(void) {
+  struct EasyList a = EasyList__new_empty();
+  struct EasyInteger x = EasyInteger__from_cstr("10");
+  struct EasyGenericObject y = {.type = EASY_INTEGER_TYPE, .data = {.integer = x}};
+  struct EasyList b = EasyList__append(&a, &y);
+
+  EasyList__print(&a);
+  printf("\n");
+  EasyList__print_json(&a);
+  printf("\n");
+
+  EasyList__print(&b);
+  printf("\n");
+  EasyList__print_json(&b);
+  printf("\n");
+
+  EasyList__destroy(&a);
+  EasyList__destroy(&b);
+}
+
 int main(void) {
   test_easy_boolean();
   print_green_ok();
   test_easy_integer();
   print_green_ok();
   test_easy_text();
+  print_green_ok();
+  test_easy_list();
   print_green_ok();
   return 0;
 }
