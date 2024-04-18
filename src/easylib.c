@@ -134,13 +134,6 @@ struct EasyTable EasyTable__copy(struct EasyTable *me) {
   return (struct EasyTable){0};
 }
 
-struct EasyText EasyText__copy(struct EasyText *me) {
-  EASY_GUARD(me != NULL && me->data != NULL, "ptr must not be NULL");
-  return (struct EasyText){
-      .data = EASY_DUPLICATE(&me->data, me->length, sizeof(*me->data)),
-      .length = me->length};
-}
-
 struct EasyFraction EasyFraction__copy(struct EasyFraction *me) {
   EASY_GUARD(me != NULL, "ptr must not be NULL");
   return (struct EasyFraction){.numerator = EasyInteger__copy(&me->numerator),

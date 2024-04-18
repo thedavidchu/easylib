@@ -79,6 +79,13 @@ void EasyText__print_json(struct EasyText *me) {
   printf("\", \".length\": %zu}", me->length);
 }
 
+struct EasyText EasyText__copy(struct EasyText *me) {
+  EASY_GUARD(me != NULL && me->data != NULL, "ptr must not be NULL");
+  return (struct EasyText){
+      .data = EASY_DUPLICATE(&me->data, me->length, sizeof(*me->data)),
+      .length = me->length};
+}
+
 void EasyText__destroy(struct EasyText *me) {
   EASY_GUARD(me != NULL && me->data != NULL, "input should be non-null");
   EASY_FREE(me->data);
