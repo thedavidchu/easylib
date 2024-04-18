@@ -141,11 +141,6 @@ struct EasyFraction EasyFraction__copy(struct EasyFraction *me) {
                                    EasyInteger__copy(&me->denominator)};
 }
 
-enum EasyBoolean EasyBoolean__copy(enum EasyBoolean *me) {
-  EASY_GUARD(me != NULL && (*me == TRUE || *me == FALSE), "ptr must not be NULL");
-  return *me;
-}
-
 EasyNothing EasyNothing__copy(EasyNothing *me) {
   EASY_GUARD(me != NULL, "ptr must not be NULL");
   EASY_GUARD(*me == NOTHING, "EasyNothing must be NOTHING");
@@ -201,11 +196,6 @@ void EasyFraction__destroy(struct EasyFraction *me) {
     EasyInteger__destroy(&me->numerator);
     EasyInteger__destroy(&me->denominator);
     *me = (struct EasyFraction){0};
-}
-
-void EasyBoolean__destroy(enum EasyBoolean *me) {
-  EASY_GUARD(me != NULL && (*me == TRUE || *me == FALSE), "ptr must not be NULL");
-  *me = FALSE;
 }
 
 void EasyNothing__destroy(EasyNothing *me) {

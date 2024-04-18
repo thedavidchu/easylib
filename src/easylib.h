@@ -148,8 +148,6 @@ struct EasyTable EasyTable__copy(struct EasyTable *me) ;
 
 struct EasyFraction EasyFraction__copy(struct EasyFraction *me) ;
 
-enum EasyBoolean EasyBoolean__copy(enum EasyBoolean *me) ;
-
 EasyNothing EasyNothing__copy(EasyNothing *me) ;
 
 struct EasyGenericObject EasyGenericObject__copy(struct EasyGenericObject *me) ;
