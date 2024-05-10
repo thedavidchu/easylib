@@ -10,9 +10,13 @@ struct EasyList {
 };
 
 struct EasyList EasyList__new_empty();
-struct EasyList EasyList__append(struct EasyList *me,
+struct EasyList EasyList__append(struct EasyList const *const me,
                                  struct EasyGenericObject *obj);
-struct EasyList EasyList__copy(struct EasyList *me);
+struct EasyGenericObject EasyList__lookup(struct EasyList const *const me,
+                                          const size_t index);
+struct EasyList EasyList__remove(struct EasyList const *const me,
+                                 const size_t index);
+struct EasyList EasyList__copy(struct EasyList const *const me);
 void EasyList__destroy(struct EasyList *me);
 
 void EasyList__print(struct EasyList *me);

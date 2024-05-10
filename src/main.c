@@ -135,23 +135,48 @@ void test_easy_text(void) {
 
 void test_easy_list(void) {
   struct EasyList a = EasyList__new_empty();
-  struct EasyInteger x = EasyInteger__from_cstr("10");
-  struct EasyGenericObject y = {.type = EASY_INTEGER_TYPE,
-                                .data = {.integer = x}};
-  struct EasyList b = EasyList__append(&a, &y);
 
   EasyList__print(&a);
   printf("\n");
   EasyList__print_json(&a);
   printf("\n");
 
+  struct EasyInteger x_i = EasyInteger__from_cstr("10");
+  struct EasyGenericObject x_o = {.type = EASY_INTEGER_TYPE,
+                                  .data = {.integer = x_i}};
+  struct EasyList b = EasyList__append(&a, &x_o);
+
   EasyList__print(&b);
   printf("\n");
   EasyList__print_json(&b);
   printf("\n");
 
+  struct EasyInteger y_i = EasyInteger__from_cstr("11");
+  struct EasyGenericObject y_o = {.type = EASY_INTEGER_TYPE,
+                                  .data = {.integer = y_i}};
+  struct EasyList c = EasyList__append(&b, &y_o);
+
+  EasyList__print(&c);
+  printf("\n");
+  EasyList__print_json(&c);
+  printf("\n");
+
+  struct EasyGenericObject z_o = EasyList__lookup(&c, 1);
+
+  EasyList__print(&c);
+  printf("[1] = ");
+  EasyGenericObject__print(&z_o);
+  printf("\n");
+
+  struct EasyList d = EasyList__remove(&c, 0);
+
+  EasyList__print(&d);
+  printf("\n");
+
   EasyList__destroy(&a);
   EasyList__destroy(&b);
+  EasyList__destroy(&c);
+  EasyList__destroy(&d);
 }
 
 int main(void) {

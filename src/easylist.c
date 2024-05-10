@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "easycommon.h"
 #include "easylib.h"
@@ -11,7 +12,7 @@ struct EasyList EasyList__new_empty() {
   return (struct EasyList){.data = EASY_MALLOC(0, 0), .length = 0};
 }
 
-struct EasyList EasyList__append(struct EasyList *me,
+struct EasyList EasyList__append(struct EasyList const *const me,
                                  struct EasyGenericObject *obj) {
   struct EasyList new_item = {
       .data = EASY_CALLOC(me->length + 1, sizeof(*me->data)),
@@ -24,7 +25,36 @@ struct EasyList EasyList__append(struct EasyList *me,
   return new_item;
 }
 
-struct EasyList EasyList__copy(struct EasyList *me) {
+struct EasyGenericObject EasyList__lookup(struct EasyList const *const me,
+                                          const size_t index) {
+  EASY_GUARD(me != NULL && me->data != NULL, "ptr must not be NULL");
+  EASY_GUARD(index < me->length, "index must fall within the list length");
+  return EasyGenericObject__copy(&me->data[index]);
+}
+
+struct EasyList EasyList__remove(struct EasyList const *const me,
+                                 const size_t index) {
+  EASY_GUARD(me != NULL && me->data != NULL, "ptr must not be NULL");
+  EASY_GUARD(index < me->length, "index must fall within the list length");
+
+  struct EasyList new_item = {
+      .data = EASY_CALLOC(me->length - 1, sizeof(*me->data)),
+      .length = me->length - 1};
+
+  size_t new_i = 0;
+  for (size_t my_i = 0; my_i < me->length; ++my_i) {
+    if (my_i == index) {
+      continue;
+    }
+    printf("%zu -> %zu\n", new_i, my_i);
+    fflush(stdout);
+    new_item.data[new_i] = EasyGenericObject__copy(&me->data[my_i]);
+    ++new_i;
+  }
+  return new_item;
+}
+
+struct EasyList EasyList__copy(struct EasyList const *const me) {
   struct EasyList new_item = {
       .data = EASY_CALLOC(me->length, sizeof(*me->data)), .length = me->length};
   /* Recursively copy data */
