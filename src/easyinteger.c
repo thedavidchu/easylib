@@ -11,7 +11,7 @@
 #include "easyinteger.h"
 
 /** Convert a C-style string to an EasyInteger. */
-struct EasyInteger EasyInteger__from_cstr(char const *str) {
+struct EasyInteger EasyInteger__from_cstr(char const *const str) {
   struct EasyInteger me = {0};
   char const *digit_str = NULL;
   size_t num_char = strlen(str);
@@ -69,8 +69,8 @@ struct EasyInteger EasyInteger__copy(struct EasyInteger const *const me) {
 #define NUM_INTEGER_DIGITS 10
 
 /** Helper function to find the larger absolute value */
-static int compare_absolute_integer(struct EasyInteger *a,
-                                    struct EasyInteger *b) {
+static int compare_absolute_integer(struct EasyInteger const *const a,
+                                    struct EasyInteger const *const b) {
   EASY_GUARD(a != NULL && a->data != NULL, "inputs must be non-null");
   EASY_GUARD(b != NULL && b->data != NULL, "inputs must be non-null");
   if (a->length > b->length) {
@@ -96,8 +96,8 @@ static int compare_absolute_integer(struct EasyInteger *a,
   return 0;
 }
 
-struct EasyInteger EasyInteger__add(struct EasyInteger *a,
-                                    struct EasyInteger *b) {
+struct EasyInteger EasyInteger__add(struct EasyInteger const *const a,
+                                    struct EasyInteger const *const b) {
   EASY_GUARD(a != NULL && a->data != NULL, "inputs must be non-null");
   EASY_GUARD(b != NULL && b->data != NULL, "inputs must be non-null");
   struct EasyInteger me = {0};
@@ -138,7 +138,8 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
     me.data = EASY_CALLOC(max_ans_length, sizeof(*me.data));
     me.length = 0; /* This will be iteratively lengthened */
 
-    struct EasyInteger *larger_int = NULL, *smaller_int = NULL;
+    struct EasyInteger const *larger_int = NULL;
+    struct EasyInteger const *smaller_int = NULL;
     switch (compare_absolute_integer(a, b)) {
     case 0:
       return EasyInteger__from_cstr("0");
@@ -179,8 +180,8 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
   }
 }
 
-struct EasyInteger EasyInteger__multiply(struct EasyInteger *a,
-                                         struct EasyInteger *b) {
+struct EasyInteger EasyInteger__multiply(struct EasyInteger const *const a,
+                                         struct EasyInteger const *const b) {
   EASY_GUARD(a != NULL && a->data != NULL, "inputs must be non-null");
   EASY_GUARD(b != NULL && b->data != NULL, "inputs must be non-null");
 
@@ -231,7 +232,7 @@ struct EasyInteger EasyInteger__multiply(struct EasyInteger *a,
   return me;
 }
 
-void EasyInteger__print(struct EasyInteger *me) {
+void EasyInteger__print(struct EasyInteger const *const me) {
   EASY_GUARD(me != NULL && me->data != NULL, "input should be non-null");
   if (me->sign == NEGATIVE) {
     printf("-");
@@ -241,7 +242,7 @@ void EasyInteger__print(struct EasyInteger *me) {
   }
 }
 
-void EasyInteger__print_json(struct EasyInteger *me) {
+void EasyInteger__print_json(struct EasyInteger const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   printf("{\"type\": \"EasyInteger\", \".sign\": %d, \".data\": ", me->sign);
   /* NOTE This isn't guaranteed to be printed in such an easily readable
@@ -252,7 +253,7 @@ void EasyInteger__print_json(struct EasyInteger *me) {
   printf(", \".length\": %zu}", me->length);
 }
 
-void EasyInteger__destroy(struct EasyInteger *me) {
+void EasyInteger__destroy(struct EasyInteger *const me) {
   EASY_GUARD(me != NULL && me->data != NULL, "input should be non-null");
   EASY_FREE(me->data);
 

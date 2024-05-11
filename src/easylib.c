@@ -3,7 +3,7 @@
 #include "easycommon.h"
 #include "easyinteger.h"
 
-void EasyGenericType__print_json(enum EasyGenericType *me) {
+void EasyGenericType__print_json(enum EasyGenericType const *const me) {
   switch (*me) {
   case EASY_TABLE_TYPE:
     printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_TABLE_TYPE\", "
@@ -45,18 +45,18 @@ void EasyGenericType__print_json(enum EasyGenericType *me) {
   }
 }
 
-void EasyFraction__print_json(struct EasyFraction *me) {
+void EasyFraction__print_json(struct EasyFraction const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   printf("{\"type\": \"EasyFraction\", ...}");
 }
 
-void EasyNothing__print_json(EasyNothing *me) {
+void EasyNothing__print_json(EasyNothing const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   EASY_GUARD(*me != NULL, "pointer must be NULL");
   printf("{\"type\": \"EasyNothing\", \"data\": \"%p\"}", *me);
 }
 
-void EasyGenericObject__print_json(struct EasyGenericObject *me) {
+void EasyGenericObject__print_json(struct EasyGenericObject const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   printf("{\"type\": \"EasyGenericObject\", \".type\": ");
   EasyGenericType__print_json(&me->type);
@@ -89,7 +89,7 @@ void EasyGenericObject__print_json(struct EasyGenericObject *me) {
   printf("}");
 }
 
-void EasyGenericObject__print(struct EasyGenericObject *me) {
+void EasyGenericObject__print(struct EasyGenericObject const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   switch (me->type) {
   case EASY_TABLE_TYPE:
@@ -170,19 +170,19 @@ EasyGenericObject__copy(struct EasyGenericObject const *const me) {
   return (struct EasyGenericObject){0};
 }
 
-void EasyFraction__destroy(struct EasyFraction *me) {
+void EasyFraction__destroy(struct EasyFraction *const me) {
   EasyInteger__destroy(&me->numerator);
   EasyInteger__destroy(&me->denominator);
   *me = (struct EasyFraction){0};
 }
 
-void EasyNothing__destroy(EasyNothing *me) {
+void EasyNothing__destroy(EasyNothing *const me) {
   EASY_GUARD(me != NULL, "ptr must not be NULL");
   EASY_GUARD(*me == NOTHING, "EasyNothing must be NOTHING");
   *me = NOTHING;
 }
 
-void EasyGenericObject__destroy(struct EasyGenericObject *me) {
+void EasyGenericObject__destroy(struct EasyGenericObject *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   switch (me->type) {
   case EASY_TABLE_TYPE:

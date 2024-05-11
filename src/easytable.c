@@ -18,9 +18,10 @@ struct EasyTable EasyTable__new_empty() {
   return new_item;
 }
 
-struct EasyTable EasyTable__insert(struct EasyTable *me,
-                                   struct EasyGenericObject *key,
-                                   struct EasyGenericObject *value) {
+struct EasyTable
+EasyTable__insert(struct EasyTable const *const me,
+                  struct EasyGenericObject const *const key,
+                  struct EasyGenericObject const *const value) {
   (void)me;
   (void)key;
   (void)value;
@@ -28,15 +29,17 @@ struct EasyTable EasyTable__insert(struct EasyTable *me,
   return (struct EasyTable){0};
 }
 
-struct EasyGenericObject EasyTable__lookup(struct EasyTable *me,
-                                           struct EasyGenericObject *key) {
+struct EasyGenericObject
+EasyTable__lookup(struct EasyTable const *const me,
+                  struct EasyGenericObject const *const key) {
   (void)me;
   (void)key;
   EASY_NOT_IMPLEMENTED();
   return (struct EasyGenericObject){0};
 }
 
-bool EasyTable__remove(struct EasyTable *me, struct EasyGenericObject *key) {
+bool EasyTable__remove(struct EasyTable const *const me,
+                       struct EasyGenericObject const *const key) {
   (void)me;
   (void)key;
   EASY_NOT_IMPLEMENTED();
@@ -61,7 +64,7 @@ struct EasyTable EasyTable__copy(struct EasyTable const *const me) {
   return new_item;
 }
 
-void EasyTable__print_json(struct EasyTable *me) {
+void EasyTable__print_json(struct EasyTable const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   printf("{\"type\": \"EasyTable\", \".length\": %zu, \".capacity\": %zu, "
          "\".data\": [",
@@ -84,7 +87,7 @@ void EasyTable__print_json(struct EasyTable *me) {
   printf("]}");
 }
 
-void EasyTable__print(struct EasyTable *me) {
+void EasyTable__print(struct EasyTable const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   EASY_GUARD(me->data == NULL && me->capacity != 0, "invalid capacity");
 
@@ -106,7 +109,7 @@ void EasyTable__print(struct EasyTable *me) {
   printf("}");
 }
 
-void EasyTable__destroy(struct EasyTable *me) {
+void EasyTable__destroy(struct EasyTable *const me) {
   // NOTE   This excludes destroying empty tables.
   EASY_GUARD(me != NULL, "ptr must not be NULL");
   EASY_GUARD(me->data == NULL && me->capacity != 0, "invalid capacity");

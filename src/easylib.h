@@ -118,15 +118,15 @@ struct EasyGenericObject {
  *  GENERIC LIBRARY IMPLEMENTATION
  ******************************************************************************/
 
-void EasyGenericType__print_json(enum EasyGenericType *me);
+void EasyGenericType__print_json(enum EasyGenericType const *const me);
 
-void EasyFraction__print_json(struct EasyFraction *me);
+void EasyFraction__print_json(struct EasyFraction const *const me);
 
-void EasyNothing__print_json(EasyNothing *me);
+void EasyNothing__print_json(EasyNothing const *const me);
 
-void EasyGenericObject__print_json(struct EasyGenericObject *me);
+void EasyGenericObject__print_json(struct EasyGenericObject const *const me);
 
-void EasyGenericObject__print(struct EasyGenericObject *me);
+void EasyGenericObject__print(struct EasyGenericObject const *const me);
 
 struct EasyFraction EasyFraction__copy(struct EasyFraction const *const me);
 
@@ -135,6 +135,6 @@ EasyNothing EasyNothing__copy(EasyNothing const *const me);
 struct EasyGenericObject
 EasyGenericObject__copy(struct EasyGenericObject const *const me);
 
-void EasyGenericObject__destroy(struct EasyGenericObject *me);
+void EasyGenericObject__destroy(struct EasyGenericObject *const me);
 
 #endif /* !EASYLIB_H */

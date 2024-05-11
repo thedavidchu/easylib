@@ -6,7 +6,7 @@
 
 #include "easytext.h"
 
-static void assert_well_formed(struct EasyText *me) {
+static void assert_well_formed(struct EasyText const *const me) {
   EASY_GUARD(me != NULL, "expected non-NULL me");
   EASY_ASSERT(me->data[me->length] == '\0',
               "expected '\0' terminated C-style string");
@@ -53,7 +53,7 @@ static inline void print_jsonified_char(char const c) {
   }
 }
 
-struct EasyText EasyText__from_cstr(char const *str) {
+struct EasyText EasyText__from_cstr(char const *const str) {
   EASY_GUARD(str != NULL, "expected non-NULL C-style string");
 
   struct EasyText me = {0};
@@ -62,12 +62,12 @@ struct EasyText EasyText__from_cstr(char const *str) {
   return me;
 }
 
-void EasyText__print(struct EasyText *me) {
+void EasyText__print(struct EasyText const *const me) {
   assert_well_formed(me);
   printf("%s", me->data);
 }
 
-void EasyText__print_json(struct EasyText *me) {
+void EasyText__print_json(struct EasyText const *const me) {
   assert_well_formed(me);
   printf("{\"type\": \"EasyText\", \".data\": \"");
 
@@ -86,7 +86,7 @@ struct EasyText EasyText__copy(struct EasyText const *const me) {
       .length = me->length};
 }
 
-void EasyText__destroy(struct EasyText *me) {
+void EasyText__destroy(struct EasyText *const me) {
   EASY_GUARD(me != NULL && me->data != NULL, "input should be non-null");
   EASY_FREE(me->data);
 

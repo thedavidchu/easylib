@@ -15,14 +15,16 @@ struct EasyTable {
 };
 
 struct EasyTable EasyTable__new_empty();
-struct EasyTable EasyTable__insert(struct EasyTable *me,
-                                   struct EasyGenericObject *key,
-                                   struct EasyGenericObject *value);
-struct EasyGenericObject EasyTable__lookup(struct EasyTable *me,
-                                           struct EasyGenericObject *key);
-bool EasyTable__remove(struct EasyTable *me, struct EasyGenericObject *key);
+struct EasyTable EasyTable__insert(struct EasyTable const *const me,
+                                   struct EasyGenericObject const *const key,
+                                   struct EasyGenericObject const *const value);
+struct EasyGenericObject
+EasyTable__lookup(struct EasyTable const *const me,
+                  struct EasyGenericObject const *const key);
+bool EasyTable__remove(struct EasyTable const *const me,
+                       struct EasyGenericObject const *const key);
 struct EasyTable EasyTable__copy(struct EasyTable const *const me);
-void EasyTable__destroy(struct EasyTable *me);
+void EasyTable__destroy(struct EasyTable *const me);
 
-void EasyTable__print_json(struct EasyTable *me);
-void EasyTable__print(struct EasyTable *me);
+void EasyTable__print_json(struct EasyTable const *const me);
+void EasyTable__print(struct EasyTable const *const me);

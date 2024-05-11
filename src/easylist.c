@@ -64,7 +64,7 @@ struct EasyList EasyList__copy(struct EasyList const *const me) {
   return new_item;
 }
 
-void EasyList__destroy(struct EasyList *me) {
+void EasyList__destroy(struct EasyList *const me) {
   EASY_GUARD(me != NULL && me->data != NULL, "ptr must not be NULL");
   for (size_t i = 0; i < me->length; ++i) {
     EasyGenericObject__destroy(&me->data[i]);
@@ -73,7 +73,7 @@ void EasyList__destroy(struct EasyList *me) {
   *me = (struct EasyList){0};
 }
 
-void EasyList__print(struct EasyList *me) {
+void EasyList__print(struct EasyList const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   EASY_ASSERT(me->data != NULL, "me->data should not be NULL");
   printf("[");
@@ -86,7 +86,7 @@ void EasyList__print(struct EasyList *me) {
   printf("]");
 }
 
-void EasyList__print_json(struct EasyList *me) {
+void EasyList__print_json(struct EasyList const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   EASY_ASSERT(me->data != NULL, "me->data should not be NULL");
   printf("{\"type\": \"EasyList\", \".length\": %zu, \".data\": [", me->length);
