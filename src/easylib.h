@@ -128,11 +128,12 @@ void EasyGenericObject__print_json(struct EasyGenericObject *me);
 
 void EasyGenericObject__print(struct EasyGenericObject *me);
 
-struct EasyFraction EasyFraction__copy(struct EasyFraction *me);
+struct EasyFraction EasyFraction__copy(struct EasyFraction const *const me);
 
-EasyNothing EasyNothing__copy(EasyNothing *me);
+EasyNothing EasyNothing__copy(EasyNothing const *const me);
 
-struct EasyGenericObject EasyGenericObject__copy(struct EasyGenericObject *me);
+struct EasyGenericObject
+EasyGenericObject__copy(struct EasyGenericObject const *const me);
 
 void EasyGenericObject__destroy(struct EasyGenericObject *me);
 

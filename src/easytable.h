@@ -21,7 +21,7 @@ struct EasyTable EasyTable__insert(struct EasyTable *me,
 struct EasyGenericObject EasyTable__lookup(struct EasyTable *me,
                                            struct EasyGenericObject *key);
 bool EasyTable__remove(struct EasyTable *me, struct EasyGenericObject *key);
-struct EasyTable EasyTable__copy(struct EasyTable *me);
+struct EasyTable EasyTable__copy(struct EasyTable const *const me);
 void EasyTable__destroy(struct EasyTable *me);
 
 void EasyTable__print_json(struct EasyTable *me);

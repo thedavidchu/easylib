@@ -58,7 +58,7 @@ struct EasyInteger EasyInteger__from_cstr(char const *str) {
   return me;
 }
 
-struct EasyInteger EasyInteger__copy(struct EasyInteger *me) {
+struct EasyInteger EasyInteger__copy(struct EasyInteger const *const me) {
   EASY_GUARD(me != NULL, "inputs must be non-null");
   struct EasyInteger copy = *me;
   /* Deep copy data so that the owner is clear */
@@ -153,12 +153,9 @@ struct EasyInteger EasyInteger__add(struct EasyInteger *a,
     default:
       EASY_IMPOSSIBLE();
     }
-
     me.sign = larger_int->sign;
-    me.data = EASY_CALLOC(max_ans_length, sizeof(*me.data));
 
     signed char borrow = 0;
-
     /* Importantly, max_ans_length == MAX(a->length, b->length)! */
     for (size_t i = 0; i < max_ans_length; ++i) {
       signed char big_ = i < larger_int->length ? larger_int->data[i] : 0;

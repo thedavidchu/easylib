@@ -11,7 +11,7 @@ struct EasyList {
 
 struct EasyList EasyList__new_empty();
 struct EasyList EasyList__append(struct EasyList const *const me,
-                                 struct EasyGenericObject *obj);
+                                 struct EasyGenericObject const *const obj);
 struct EasyGenericObject EasyList__lookup(struct EasyList const *const me,
                                           const size_t index);
 struct EasyList EasyList__remove(struct EasyList const *const me,

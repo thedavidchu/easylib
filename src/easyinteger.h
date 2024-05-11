@@ -31,7 +31,7 @@ struct EasyInteger {
 };
 
 struct EasyInteger EasyInteger__from_cstr(char const *str);
-struct EasyInteger EasyInteger__copy(struct EasyInteger *me);
+struct EasyInteger EasyInteger__copy(struct EasyInteger const *const me);
 struct EasyInteger EasyInteger__add(struct EasyInteger *a,
                                     struct EasyInteger *b);
 struct EasyInteger EasyInteger__multiply(struct EasyInteger *a,

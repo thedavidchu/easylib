@@ -14,16 +14,13 @@ void EasyGenericType__print_json(enum EasyGenericType *me) {
     printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_LIST_TYPE\", "
            "\"number\": %d}",
            *me);
-    printf("EASY_LIST_TYPE");
     break;
   case EASY_TEXT_TYPE:
     printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_TEXT_TYPE\", "
            "\"number\": %d}",
            *me);
-    printf("EASY_TEXT_TYPE");
     break;
   case EASY_INTEGER_TYPE:
-    printf("EASY_INTEGER_TYPE");
     printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_INTEGER_TYPE\", "
            "\"number\": %d}",
            *me);
@@ -32,13 +29,11 @@ void EasyGenericType__print_json(enum EasyGenericType *me) {
     printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_FRACTION_TYPE\", "
            "\"number\": %d}",
            *me);
-    printf("EASY_FRACTION_TYPE");
     break;
   case EASY_BOOLEAN_TYPE:
     printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_BOOLEAN_TYPE\", "
            "\"number\": %d}",
            *me);
-    printf("EASY_BOOLEAN_TYPE");
     break;
   case EASY_NOTHING_TYPE:
     printf("{\"type\": \"EasyGenericType\", \"text\": \"EASY_NOTHING_TYPE\", "
@@ -123,20 +118,21 @@ void EasyGenericObject__print(struct EasyGenericObject *me) {
   }
 }
 
-struct EasyFraction EasyFraction__copy(struct EasyFraction *me) {
+struct EasyFraction EasyFraction__copy(struct EasyFraction const *const me) {
   EASY_GUARD(me != NULL, "ptr must not be NULL");
   return (struct EasyFraction){.numerator = EasyInteger__copy(&me->numerator),
                                .denominator =
                                    EasyInteger__copy(&me->denominator)};
 }
 
-EasyNothing EasyNothing__copy(EasyNothing *me) {
+EasyNothing EasyNothing__copy(EasyNothing const *const me) {
   EASY_GUARD(me != NULL, "ptr must not be NULL");
   EASY_GUARD(*me == NOTHING, "EasyNothing must be NOTHING");
   return *me;
 }
 
-struct EasyGenericObject EasyGenericObject__copy(struct EasyGenericObject *me) {
+struct EasyGenericObject
+EasyGenericObject__copy(struct EasyGenericObject const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   switch (me->type) {
   case EASY_TABLE_TYPE:

@@ -43,7 +43,7 @@ bool EasyTable__remove(struct EasyTable *me, struct EasyGenericObject *key) {
   return true;
 }
 
-struct EasyTable EasyTable__copy(struct EasyTable *me) {
+struct EasyTable EasyTable__copy(struct EasyTable const *const me) {
   struct EasyTable new_item = {.data =
                                    EASY_MALLOC(me->capacity, sizeof(*me->data)),
                                .length = me->length,

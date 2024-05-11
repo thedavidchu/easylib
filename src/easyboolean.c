@@ -3,7 +3,7 @@
 #include "easyboolean.h"
 #include "easycommon.h"
 
-enum EasyBoolean EasyBoolean__copy(enum EasyBoolean *me) {
+enum EasyBoolean EasyBoolean__copy(enum EasyBoolean const *const me) {
   EASY_GUARD(me != NULL && (*me == TRUE || *me == FALSE),
              "ptr must not be NULL");
   return *me;

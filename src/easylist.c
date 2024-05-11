@@ -13,7 +13,7 @@ struct EasyList EasyList__new_empty() {
 }
 
 struct EasyList EasyList__append(struct EasyList const *const me,
-                                 struct EasyGenericObject *obj) {
+                                 struct EasyGenericObject const *const obj) {
   struct EasyList new_item = {
       .data = EASY_CALLOC(me->length + 1, sizeof(*me->data)),
       .length = me->length + 1};
@@ -21,7 +21,7 @@ struct EasyList EasyList__append(struct EasyList const *const me,
   for (size_t i = 0; i < me->length; ++i) {
     new_item.data[i] = EasyGenericObject__copy(&me->data[i]);
   }
-  new_item.data[me->length] = *obj;
+  new_item.data[me->length] = EasyGenericObject__copy(obj);
   return new_item;
 }
 
