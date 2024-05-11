@@ -59,26 +59,14 @@
 /*******************************************************************************
  *  GENERIC LIBRARY DATA STRUCTURES
  ******************************************************************************/
-/* Stand-alone types */
-typedef void *EasyNothing; /* We want this to act as NULL in C */
-struct EasyText;
-struct EasyInteger;
-
-/* Composite types */
-struct EasyTable;
-struct EasyList;
-struct EasyFraction;
-
 /* Generic types */
 union EasyGenericData;
 struct EasyGenericObject;
 
-/* EasyNothing */
-static const EasyNothing NOTHING = NULL;
-
 #include "easyboolean.h"
 #include "easyinteger.h"
 #include "easylist.h"
+#include "easynothing.h"
 #include "easytable.h"
 #include "easytext.h"
 
@@ -122,15 +110,13 @@ void EasyGenericType__print_json(enum EasyGenericType const *const me);
 
 void EasyFraction__print_json(struct EasyFraction const *const me);
 
-void EasyNothing__print_json(EasyNothing const *const me);
-
 void EasyGenericObject__print_json(struct EasyGenericObject const *const me);
+
+void EasyFraction__print(struct EasyFraction const *const me);
 
 void EasyGenericObject__print(struct EasyGenericObject const *const me);
 
 struct EasyFraction EasyFraction__copy(struct EasyFraction const *const me);
-
-EasyNothing EasyNothing__copy(EasyNothing const *const me);
 
 struct EasyGenericObject
 EasyGenericObject__copy(struct EasyGenericObject const *const me);

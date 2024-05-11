@@ -45,15 +45,15 @@ void EasyGenericType__print_json(enum EasyGenericType const *const me) {
   }
 }
 
+void EasyFraction__print(struct EasyFraction const *const me) {
+  (void)me;
+  EASY_NOT_IMPLEMENTED();
+}
+
 void EasyFraction__print_json(struct EasyFraction const *const me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   printf("{\"type\": \"EasyFraction\", ...}");
-}
-
-void EasyNothing__print_json(EasyNothing const *const me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  EASY_GUARD(*me != NULL, "pointer must be NULL");
-  printf("{\"type\": \"EasyNothing\", \"data\": \"%p\"}", *me);
+  EASY_NOT_IMPLEMENTED();
 }
 
 void EasyGenericObject__print_json(struct EasyGenericObject const *const me) {
@@ -105,13 +105,13 @@ void EasyGenericObject__print(struct EasyGenericObject const *const me) {
     EasyInteger__print(&me->data.integer);
     break;
   case EASY_FRACTION_TYPE:
-    // EasyFraction__print(&me->data.fraction);
-    // break;
+    EasyFraction__print(&me->data.fraction);
+    break;
   case EASY_BOOLEAN_TYPE:
     EasyBoolean__print(&me->data.boolean);
     break;
   case EASY_NOTHING_TYPE:
-    // EasyNothing__print(&me->data.nothing);
+    EasyNothing__print(&me->data.nothing);
     break;
   default:
     EASY_IMPOSSIBLE();
@@ -123,12 +123,6 @@ struct EasyFraction EasyFraction__copy(struct EasyFraction const *const me) {
   return (struct EasyFraction){.numerator = EasyInteger__copy(&me->numerator),
                                .denominator =
                                    EasyInteger__copy(&me->denominator)};
-}
-
-EasyNothing EasyNothing__copy(EasyNothing const *const me) {
-  EASY_GUARD(me != NULL, "ptr must not be NULL");
-  EASY_GUARD(*me == NOTHING, "EasyNothing must be NOTHING");
-  return *me;
 }
 
 struct EasyGenericObject
@@ -174,12 +168,6 @@ void EasyFraction__destroy(struct EasyFraction *const me) {
   EasyInteger__destroy(&me->numerator);
   EasyInteger__destroy(&me->denominator);
   *me = (struct EasyFraction){0};
-}
-
-void EasyNothing__destroy(EasyNothing *const me) {
-  EASY_GUARD(me != NULL, "ptr must not be NULL");
-  EASY_GUARD(*me == NOTHING, "EasyNothing must be NOTHING");
-  *me = NOTHING;
 }
 
 void EasyGenericObject__destroy(struct EasyGenericObject *const me) {
