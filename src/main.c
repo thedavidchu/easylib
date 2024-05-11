@@ -2,13 +2,16 @@
 
 #include <stdio.h>
 
+#include "common/easylogger.h"
 #include "easyboolean.h"
 #include "easyinteger.h"
 #include "easylib.h"
 #include "easylist.h"
 #include "easytext.h"
 
-void print_green_ok(void) { printf("\033[32m--- OK ---\n\033[0m"); }
+void print_green_ok(struct EasyLogger logger) {
+  EASY_LOGGER_INFO(logger, "\033[32m--- OK ---\n\033[0m");
+}
 
 void test_easy_boolean(void) {
   enum EasyBoolean a = TRUE;
@@ -183,13 +186,15 @@ void test_easy_list(void) {
 }
 
 int main(void) {
+  struct EasyLogger logger = {.stream = stderr,
+                              .level = EASY_LOGGER_LEVEL_TRACE};
   test_easy_boolean();
-  print_green_ok();
+  print_green_ok(logger);
   test_easy_integer();
-  print_green_ok();
+  print_green_ok(logger);
   test_easy_text();
-  print_green_ok();
+  print_green_ok(logger);
   test_easy_list();
-  print_green_ok();
+  print_green_ok(logger);
   return 0;
 }
