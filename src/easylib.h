@@ -73,19 +73,13 @@ struct EasyFraction;
 union EasyGenericData;
 struct EasyGenericObject;
 
-/* EasyTable */
-struct EasyTable {
-  struct EasyTableItem *data;
-  size_t length;   /* The number of elements in the EasyTable */
-  size_t capacity; /* The maximum number of elements in the EasyTable */
-};
-
 /* EasyNothing */
 static const EasyNothing NOTHING = NULL;
 
 #include "easyboolean.h"
 #include "easyinteger.h"
 #include "easylist.h"
+#include "easytable.h"
 #include "easytext.h"
 
 /* EasyFraction */
@@ -120,19 +114,11 @@ struct EasyGenericObject {
   union EasyGenericData data;
 };
 
-/* NOTE These need to come after the EasyGenericObject */
-struct EasyTableItem {
-  enum EasyBoolean valid;
-  struct EasyGenericObject key;
-  struct EasyGenericObject value;
-};
-
 /*******************************************************************************
  *  GENERIC LIBRARY IMPLEMENTATION
  ******************************************************************************/
 
 void EasyGenericType__print_json(enum EasyGenericType *me);
-void EasyTable__print_json(struct EasyTable *me);
 
 void EasyFraction__print_json(struct EasyFraction *me);
 
@@ -141,8 +127,6 @@ void EasyNothing__print_json(EasyNothing *me);
 void EasyGenericObject__print_json(struct EasyGenericObject *me);
 
 void EasyGenericObject__print(struct EasyGenericObject *me);
-
-struct EasyTable EasyTable__copy(struct EasyTable *me);
 
 struct EasyFraction EasyFraction__copy(struct EasyFraction *me);
 

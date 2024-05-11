@@ -50,11 +50,6 @@ void EasyGenericType__print_json(enum EasyGenericType *me) {
   }
 }
 
-void EasyTable__print_json(struct EasyTable *me) {
-  EASY_GUARD(me != NULL, "pointer must not be NULL");
-  printf("{\"type\": \"EasyTable\", ...}");
-}
-
 void EasyFraction__print_json(struct EasyFraction *me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   printf("{\"type\": \"EasyFraction\", ...}");
@@ -103,10 +98,10 @@ void EasyGenericObject__print(struct EasyGenericObject *me) {
   EASY_GUARD(me != NULL, "pointer must not be NULL");
   switch (me->type) {
   case EASY_TABLE_TYPE:
-    // EasyTable__print(&me->data.table);
+    EasyTable__print(&me->data.table);
     break;
   case EASY_LIST_TYPE:
-    // EasyList__print(&me->data.list);
+    EasyList__print(&me->data.list);
     break;
   case EASY_TEXT_TYPE:
     EasyText__print(&me->data.text);
@@ -126,11 +121,6 @@ void EasyGenericObject__print(struct EasyGenericObject *me) {
   default:
     EASY_IMPOSSIBLE();
   }
-}
-
-struct EasyTable EasyTable__copy(struct EasyTable *me) {
-  (void)me;
-  return (struct EasyTable){0};
 }
 
 struct EasyFraction EasyFraction__copy(struct EasyFraction *me) {
@@ -182,13 +172,6 @@ struct EasyGenericObject EasyGenericObject__copy(struct EasyGenericObject *me) {
   }
   /* Impossible... but compiler doesn't realize! */
   return (struct EasyGenericObject){0};
-}
-
-void EasyTable__destroy(struct EasyTable *me) {
-  /* TODO */
-  (void)me;
-  EASY_ASSERT(0, "TODO");
-  return;
 }
 
 void EasyFraction__destroy(struct EasyFraction *me) {
