@@ -1,5 +1,6 @@
 # Clangd Language Server
 .clangd
+compile_commands.json
 
 # Prerequisites
 *.d
