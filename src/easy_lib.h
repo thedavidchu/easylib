@@ -63,64 +63,71 @@
 union EasyGenericData;
 struct EasyGenericObject;
 
-#include "easyboolean.h"
-#include "easyinteger.h"
-#include "easylist.h"
-#include "easynothing.h"
-#include "easytable.h"
-#include "easytext.h"
+#include "easy_boolean.h"
+#include "easy_integer.h"
+#include "easy_list.h"
+#include "easy_nothing.h"
+#include "easy_table.h"
+#include "easy_text.h"
 
 /* EasyFraction */
 struct EasyFraction {
-  struct EasyInteger numerator;
-  struct EasyInteger denominator;
+    struct EasyInteger numerator;
+    struct EasyInteger denominator;
 };
 
 /* Generic Object */
 enum EasyGenericType {
-  EASY_TABLE_TYPE,
-  EASY_LIST_TYPE,
-  EASY_TEXT_TYPE,
-  EASY_INTEGER_TYPE,
-  EASY_FRACTION_TYPE,
-  EASY_BOOLEAN_TYPE,
-  EASY_NOTHING_TYPE,
+    EASY_TABLE_TYPE,
+    EASY_LIST_TYPE,
+    EASY_TEXT_TYPE,
+    EASY_INTEGER_TYPE,
+    EASY_FRACTION_TYPE,
+    EASY_BOOLEAN_TYPE,
+    EASY_NOTHING_TYPE,
 };
 
 union EasyGenericData {
-  struct EasyTable table;
-  struct EasyList list;
-  struct EasyText text;
-  struct EasyInteger integer;
-  struct EasyFraction fraction;
-  enum EasyBoolean boolean;
-  EasyNothing nothing;
+    struct EasyTable table;
+    struct EasyList list;
+    struct EasyText text;
+    struct EasyInteger integer;
+    struct EasyFraction fraction;
+    enum EasyBoolean boolean;
+    EasyNothing nothing;
 };
 
 struct EasyGenericObject {
-  enum EasyGenericType type;
-  union EasyGenericData data;
+    enum EasyGenericType type;
+    union EasyGenericData data;
 };
 
 /*******************************************************************************
  *  GENERIC LIBRARY IMPLEMENTATION
  ******************************************************************************/
 
-void EasyGenericType__print_json(enum EasyGenericType const *const me);
+void
+EasyGenericType__print_json(enum EasyGenericType const *const me);
 
-void EasyFraction__print_json(struct EasyFraction const *const me);
+void
+EasyFraction__print_json(struct EasyFraction const *const me);
 
-void EasyGenericObject__print_json(struct EasyGenericObject const *const me);
+void
+EasyGenericObject__print_json(struct EasyGenericObject const *const me);
 
-void EasyFraction__print(struct EasyFraction const *const me);
+void
+EasyFraction__print(struct EasyFraction const *const me);
 
-void EasyGenericObject__print(struct EasyGenericObject const *const me);
+void
+EasyGenericObject__print(struct EasyGenericObject const *const me);
 
-struct EasyFraction EasyFraction__copy(struct EasyFraction const *const me);
+struct EasyFraction
+EasyFraction__copy(struct EasyFraction const *const me);
 
 struct EasyGenericObject
 EasyGenericObject__copy(struct EasyGenericObject const *const me);
 
-void EasyGenericObject__destroy(struct EasyGenericObject *const me);
+void
+EasyGenericObject__destroy(struct EasyGenericObject *const me);
 
 #endif /* !EASYLIB_H */

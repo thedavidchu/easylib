@@ -25,19 +25,26 @@
 enum EasyIntegerSign { NEGATIVE = -1, ZERO = 0, POSITIVE = +1 };
 
 struct EasyInteger {
-  enum EasyIntegerSign sign;
-  signed char *data;
-  size_t length; /* Length of the data buffer -- no terminal NIL byte */
+    enum EasyIntegerSign sign;
+    signed char *data;
+    size_t length; /* Length of the data buffer -- no terminal NIL byte */
 };
 
-struct EasyInteger EasyInteger__from_cstr(char const *const str);
-struct EasyInteger EasyInteger__copy(struct EasyInteger const *const me);
-struct EasyInteger EasyInteger__add(struct EasyInteger const *const a,
-                                    struct EasyInteger const *const b);
-struct EasyInteger EasyInteger__multiply(struct EasyInteger const *const a,
-                                         struct EasyInteger const *const b);
-void EasyInteger__print(struct EasyInteger const *const me);
-void EasyInteger__print_json(struct EasyInteger const *const me);
-void EasyInteger__destroy(struct EasyInteger *const me);
+struct EasyInteger
+EasyInteger__from_cstr(char const *const str);
+struct EasyInteger
+EasyInteger__copy(struct EasyInteger const *const me);
+struct EasyInteger
+EasyInteger__add(struct EasyInteger const *const a,
+                 struct EasyInteger const *const b);
+struct EasyInteger
+EasyInteger__multiply(struct EasyInteger const *const a,
+                      struct EasyInteger const *const b);
+void
+EasyInteger__print(struct EasyInteger const *const me);
+void
+EasyInteger__print_json(struct EasyInteger const *const me);
+void
+EasyInteger__destroy(struct EasyInteger *const me);
 
 #endif /* !EASYINTEGER_H */
