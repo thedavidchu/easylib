@@ -16,7 +16,7 @@ void print_green_ok(struct EasyLogger logger) {
   EASY_LOGGER_INFO(logger, "\033[32m--- OK ---\n\033[0m");
 }
 
-void test_easy_boolean(void) {
+bool test_easy_boolean(void) {
   enum EasyBoolean a = TRUE;
   enum EasyBoolean b = FALSE;
 
@@ -29,9 +29,11 @@ void test_easy_boolean(void) {
   printf("\n");
   EasyBoolean__print_json(&b);
   printf("\n");
+
+  return true;
 }
 
-void test_easy_integer(void) {
+bool test_easy_integer(void) {
   /* Test basic addition: a + b = c */
   struct EasyInteger a = EasyInteger__from_cstr("+1000000");
   struct EasyInteger b = EasyInteger__from_cstr("+100");
@@ -101,9 +103,11 @@ void test_easy_integer(void) {
   EasyInteger__destroy(&j);
   EasyInteger__destroy(&k);
   EasyInteger__destroy(&l);
+
+  return true;
 }
 
-void test_easy_text(void) {
+bool test_easy_text(void) {
   struct EasyText a = EasyText__from_cstr("ABC");
   EasyText__print(&a);
   printf("\n");
@@ -137,9 +141,11 @@ void test_easy_text(void) {
 
   EasyText__destroy(&a);
   EasyText__destroy(&b);
+
+  return true;
 }
 
-void test_easy_list(void) {
+bool test_easy_list(void) {
   struct EasyList a = EasyList__new_empty();
 
   EasyList__print(&a);
@@ -186,20 +192,18 @@ void test_easy_list(void) {
   EasyGenericObject__destroy(&x);
   EasyGenericObject__destroy(&y);
   EasyGenericObject__destroy(&z);
+
+  return true;
 }
 
 int main(void) {
-  struct EasyLogger logger = {.stream = stderr,
-                              .level = EASY_LOGGER_LEVEL_TRACE};
-  test_easy_boolean();
-  print_green_ok(logger);
-  test_easy_integer();
-  print_green_ok(logger);
-  test_easy_text();
-  print_green_ok(logger);
-  test_easy_list();
-  print_green_ok(logger);
+  // Test types
+  EASY_TEST_SUCCESS(test_easy_boolean());
+  EASY_TEST_SUCCESS(test_easy_integer());
+  EASY_TEST_SUCCESS(test_easy_text());
+  EASY_TEST_SUCCESS(test_easy_list());
 
+  // Test functions
   EASY_TEST_SUCCESS(test_easy_hash());
   return 0;
 }
