@@ -31,3 +31,12 @@ _easy_test_assert_uintcmp(bool const success,
                               rhs,                                             \
                               __FILE__,                                        \
                               __LINE__)
+
+void
+_easy_test_assert_true(bool const success,
+                       char const *const comparison,
+                       char const *const file,
+                       int const line);
+
+#define EASY_TEST_ASSERT_TRUE(comparison)                                      \
+    _easy_test_assert_true(((comparison)), #comparison, __FILE__, __LINE__)

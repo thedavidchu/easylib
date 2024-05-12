@@ -59,3 +59,21 @@ _easy_test_assert_uintcmp(bool const success,
         exit(EXIT_FAILURE);
     }
 }
+
+void
+_easy_test_assert_true(bool const success,
+                       char const *const comparison,
+                       char const *const file,
+                       int const line)
+{
+    if (!success) {
+        _easy_logger(stderr,
+                     EASY_LOGGER_LEVEL_TRACE,
+                     EASY_LOGGER_LEVEL_ERROR,
+                     file,
+                     line,
+                     RED "%s failed" RESET,
+                     comparison);
+        exit(EXIT_FAILURE);
+    }
+}
