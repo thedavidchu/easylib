@@ -4,12 +4,7 @@
 #include "easycommon.h"
 #include "easylib.h"
 
-/* NOTE These need to come after the EasyGenericObject */
-struct EasyTableItem {
-  bool valid;
-  struct EasyGenericObject key;
-  struct EasyGenericObject value;
-};
+#include "easy_table_item.h"
 
 static bool is_last_element(size_t i, size_t length) { return i == length - 1; }
 

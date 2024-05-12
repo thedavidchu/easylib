@@ -1,9 +1,12 @@
 /** Test file */
 
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "common/easylogger.h"
+#include "common/easytest.h"
 #include "easyboolean.h"
+#include "easyhash.h"
 #include "easyinteger.h"
 #include "easylib.h"
 #include "easylist.h"
@@ -196,5 +199,7 @@ int main(void) {
   print_green_ok(logger);
   test_easy_list();
   print_green_ok(logger);
+
+  EASY_TEST_SUCCESS(test_easy_hash());
   return 0;
 }
