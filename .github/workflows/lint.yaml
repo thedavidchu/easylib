@@ -1,5 +1,5 @@
 # Source: https://github.com/marketplace/actions/c-c-linter
-name: cpp-linter
+name: Lint
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  cpp-linter:
+  Lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
