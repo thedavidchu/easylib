@@ -14,7 +14,7 @@ struct EasyTable {
   size_t capacity; /* The maximum number of elements in the EasyTable */
 };
 
-struct EasyTable EasyTable__new_empty();
+struct EasyTable EasyTable__new_empty(void);
 struct EasyTable EasyTable__insert(struct EasyTable const *const me,
                                    struct EasyGenericObject const *const key,
                                    struct EasyGenericObject const *const value);

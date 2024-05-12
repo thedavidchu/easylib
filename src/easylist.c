@@ -8,7 +8,7 @@
 
 static bool is_last_element(size_t i, size_t length) { return i == length - 1; }
 
-struct EasyList EasyList__new_empty() {
+struct EasyList EasyList__new_empty(void) {
   return (struct EasyList){.data = EASY_MALLOC(0, 0), .length = 0};
 }
 

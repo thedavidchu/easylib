@@ -9,7 +9,7 @@ struct EasyList {
   size_t length;
 };
 
-struct EasyList EasyList__new_empty();
+struct EasyList EasyList__new_empty(void);
 struct EasyList EasyList__append(struct EasyList const *const me,
                                  struct EasyGenericObject const *const obj);
 struct EasyGenericObject EasyList__lookup(struct EasyList const *const me,

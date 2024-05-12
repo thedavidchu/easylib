@@ -13,7 +13,7 @@ struct EasyTableItem {
 
 static bool is_last_element(size_t i, size_t length) { return i == length - 1; }
 
-struct EasyTable EasyTable__new_empty() {
+struct EasyTable EasyTable__new_empty(void) {
   struct EasyTable new_item = {.data = NULL, .length = 0, .capacity = 0};
   return new_item;
 }

@@ -3,7 +3,7 @@
 #include "easycommon.h"
 #include "easynothing.h"
 
-EasyNothing EasyNothing__new() { return NOTHING; }
+EasyNothing EasyNothing__new(void) { return NOTHING; }
 
 void EasyNothing__print(EasyNothing const *const me) {
   (void)me;
