@@ -6,6 +6,7 @@
 #include "common/easy_logger.h"
 #include "common/easy_test.h"
 #include "easy_boolean.h"
+#include "easy_equal.h"
 #include "easy_hash.h"
 #include "easy_integer.h"
 #include "easy_lib.h"
@@ -218,5 +219,6 @@ main(void)
 
     // Test functions
     EASY_TEST_SUCCESS(test_easy_hash());
+    EASY_TEST_SUCCESS(test_easy_equal());
     return 0;
 }
