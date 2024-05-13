@@ -3,8 +3,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "easy_lib.h"
-
+struct EasyGenericObject;
 struct EasyTableItem;
 
 /* EasyTable */

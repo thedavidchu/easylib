@@ -1,4 +1,3 @@
-#include <bits/stdint-uintn.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -40,7 +39,7 @@ EasyTable__hash(struct EasyTable const *const me)
     EASY_GUARD(me != NULL, "me should not be NULL");
     uint64_t hash = 0;
     for (size_t i = 0; i < me->length; ++i) {
-        if (me->data[i].valid) {
+        if (me->data[i].valid == EASY_TABLE_VALID) {
             uint64_t key_hash = EasyGenericObject__hash(&me->data[i].key);
             uint64_t val_hash = EasyGenericObject__hash(&me->data[i].value);
             // NOTE This is probably really weak for a hash function but we want

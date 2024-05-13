@@ -11,6 +11,7 @@
 #include "easy_integer.h"
 #include "easy_lib.h"
 #include "easy_list.h"
+#include "easy_table.h"
 #include "easy_text.h"
 
 void
@@ -208,6 +209,52 @@ test_easy_list(void)
     return true;
 }
 
+bool
+test_easy_table(void)
+{
+    struct EasyTable a = EasyTable__new_empty();
+
+    EasyTable__print(&a);
+    printf("\n");
+    EasyTable__print_json(&a);
+    printf("\n");
+
+    struct EasyGenericObject i = {
+        .type = EASY_INTEGER_TYPE,
+        .data = {.integer = EasyInteger__from_cstr("10")}};
+    struct EasyGenericObject j = {
+        .type = EASY_INTEGER_TYPE,
+        .data = {.integer = EasyInteger__from_cstr("11")}};
+    struct EasyGenericObject k = {
+        .type = EASY_INTEGER_TYPE,
+        .data = {.integer = EasyInteger__from_cstr("12")}};
+    struct EasyGenericObject l = {
+        .type = EASY_INTEGER_TYPE,
+        .data = {.integer = EasyInteger__from_cstr("0")}};
+
+    struct EasyTable b = EasyTable__insert(&a, &i, &j);
+    struct EasyTable c = EasyTable__insert(&b, &j, &k);
+    struct EasyTable d = EasyTable__insert(&c, &k, &l);
+
+    EasyTable__print(&b);
+    printf("\n");
+    EasyTable__print(&c);
+    printf("\n");
+    EasyTable__print(&d);
+    printf("\n");
+
+    EasyTable__destroy(&a);
+    EasyTable__destroy(&b);
+    EasyTable__destroy(&c);
+    EasyTable__destroy(&d);
+
+    EasyGenericObject__destroy(&i);
+    EasyGenericObject__destroy(&j);
+    EasyGenericObject__destroy(&k);
+    EasyGenericObject__destroy(&l);
+    return true;
+}
+
 int
 main(void)
 {
@@ -216,6 +263,7 @@ main(void)
     EASY_TEST_SUCCESS(test_easy_integer());
     EASY_TEST_SUCCESS(test_easy_text());
     EASY_TEST_SUCCESS(test_easy_list());
+    EASY_TEST_SUCCESS(test_easy_table());
 
     // Test functions
     EASY_TEST_SUCCESS(test_easy_hash());
