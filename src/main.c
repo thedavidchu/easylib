@@ -7,6 +7,7 @@
 #include "common/easy_test.h"
 #include "easy_boolean.h"
 #include "easy_equal.h"
+#include "easy_error.h"
 #include "easy_hash.h"
 #include "easy_integer.h"
 #include "easy_lib.h"
@@ -303,6 +304,39 @@ test_easy_table(void)
     return true;
 }
 
+bool
+test_easy_error(void)
+{
+    struct EasyError a = EasyError__from_errno(0);
+    struct EasyError b = EasyError__from_errno(1);
+    struct EasyError c = EasyError__from_errno(2);
+    struct EasyError d = EasyError__from_errno(3);
+    struct EasyError e = EasyError__from_errno(4);
+    struct EasyError f = EasyError__from_errno(5);
+
+    EasyError__print_json(&a);
+    printf("\n");
+    EasyError__print_json(&b);
+    printf("\n");
+    EasyError__print_json(&c);
+    printf("\n");
+    EasyError__print_json(&d);
+    printf("\n");
+    EasyError__print_json(&e);
+    printf("\n");
+    EasyError__print_json(&f);
+    printf("\n");
+
+    EasyError__destroy(&a);
+    EasyError__destroy(&b);
+    EasyError__destroy(&c);
+    EasyError__destroy(&d);
+    EasyError__destroy(&e);
+    EasyError__destroy(&f);
+
+    return true;
+}
+
 int
 main(void)
 {
@@ -312,6 +346,9 @@ main(void)
     EASY_TEST_SUCCESS(test_easy_text());
     EASY_TEST_SUCCESS(test_easy_list());
     EASY_TEST_SUCCESS(test_easy_table());
+
+    // Test Sort-of-Types
+    EASY_TEST_SUCCESS(test_easy_error());
 
     // Test functions
     EASY_TEST_SUCCESS(test_easy_hash());
