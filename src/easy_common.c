@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,12 +26,9 @@ _easy_assert(int const condition,
     if (!condition) {
         va_list ap;
         va_start(ap, msg);
-
-        fprintf(stderr, "Error [%s:%d]: ", file, line, msg);
-        fprintf(stderr, msg, ap);
-        fprintf(stream, "\n");
-        fflush(stream);
-
+        fprintf(stderr, "Error [%s:%d]: ", file, line);
+        vfprintf(stderr, msg, ap);
+        fprintf(stderr, "\n");
         va_end(ap);
         exit(EXIT_FAILURE);
     }
