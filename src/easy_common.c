@@ -16,10 +16,22 @@ easy_print_error(char *msg, char *file, int line)
 }
 
 void
-_easy_assert(int condition, char *msg, char *file, int line)
+_easy_assert(int const condition,
+             char const *const file,
+             int const line,
+             char const *const msg,
+             ...)
 {
     if (!condition) {
-        easy_print_error(msg, file, line);
+        va_list ap;
+        va_start(ap, msg);
+
+        fprintf(stderr, "Error [%s:%d]: ", file, line, msg);
+        fprintf(stderr, msg, ap);
+        fprintf(stream, "\n");
+        fflush(stream);
+
+        va_end(ap);
         exit(EXIT_FAILURE);
     }
 }
