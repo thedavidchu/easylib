@@ -20,11 +20,11 @@ _easy_assert(int const condition,
 
 /* We explicitly convert the condition to an int so that it will not cause
  * problems for the function call */
-#define EASY_ASSERT(condition, msg, ...)                                       \
-    _easy_assert((condition) ? 1 : 0, __FILE__, __LINE__, msg, __VA_ARGS__)
+#define EASY_ASSERT(condition, ...)                                            \
+    _easy_assert((condition) ? 1 : 0, __FILE__, __LINE__, __VA_ARGS__)
 /** Guard against erroneous inputs */
-#define EASY_GUARD(condition, msg, ...)                                        \
-    _easy_assert((condition) ? 1 : 0, __FILE__, __LINE__, msg, __VA_ARGS__)
+#define EASY_GUARD(condition, ...)                                             \
+    _easy_assert((condition) ? 1 : 0, __FILE__, __LINE__, __VA_ARGS__)
 #define EASY_IMPOSSIBLE() _easy_assert(0, __FILE__, __LINE__, "impossible!")
 #define EASY_NOT_IMPLEMENTED()                                                 \
     _easy_assert(0, __FILE__, __LINE__, "not implemented!")
