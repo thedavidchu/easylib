@@ -22,7 +22,7 @@ EasyTable__insert(struct EasyTable const *const me,
 struct EasyGenericObject
 EasyTable__lookup(struct EasyTable const *const me,
                   struct EasyGenericObject const *const key);
-bool
+struct EasyTable
 EasyTable__remove(struct EasyTable const *const me,
                   struct EasyGenericObject const *const key);
 struct EasyTable

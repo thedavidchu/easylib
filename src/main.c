@@ -243,15 +243,63 @@ test_easy_table(void)
     EasyTable__print(&d);
     printf("\n");
 
+    // Test lookup
+    struct EasyGenericObject m = EasyTable__lookup(&d, &i);
+    struct EasyGenericObject n = EasyTable__lookup(&d, &j);
+    struct EasyGenericObject o = EasyTable__lookup(&d, &k);
+    struct EasyGenericObject p = EasyTable__lookup(&d, &l);
+
+    EasyGenericObject__print(&m);
+    printf(" == ");
+    EasyGenericObject__print(&j);
+    printf("\n");
+
+    EasyGenericObject__print(&n);
+    printf(" == ");
+    EasyGenericObject__print(&k);
+    printf("\n");
+
+    EasyGenericObject__print(&o);
+    printf(" == ");
+    EasyGenericObject__print(&l);
+    printf("\n");
+
+    EasyGenericObject__print(&p);
+    printf(" == null\n");
+
+    // Test remove
+    struct EasyTable e = EasyTable__remove(&d, &i);
+    struct EasyTable f = EasyTable__remove(&e, &j);
+    struct EasyTable g = EasyTable__remove(&f, &k);
+    struct EasyTable h = EasyTable__remove(&g, &l);
+
+    EasyTable__print(&e);
+    printf(" == {11: 12, 12: 0, }\n");
+    EasyTable__print(&f);
+    printf(" == {12: 0, }\n");
+    EasyTable__print(&g);
+    printf(" == {}\n");
+    EasyTable__print(&h);
+    printf(" == {}\n");
+
+    // Cleanup
     EasyTable__destroy(&a);
     EasyTable__destroy(&b);
     EasyTable__destroy(&c);
     EasyTable__destroy(&d);
+    EasyTable__destroy(&e);
+    EasyTable__destroy(&f);
+    EasyTable__destroy(&g);
+    EasyTable__destroy(&h);
 
     EasyGenericObject__destroy(&i);
     EasyGenericObject__destroy(&j);
     EasyGenericObject__destroy(&k);
     EasyGenericObject__destroy(&l);
+    EasyGenericObject__destroy(&m);
+    EasyGenericObject__destroy(&n);
+    EasyGenericObject__destroy(&o);
+    EasyGenericObject__destroy(&p);
     return true;
 }
 

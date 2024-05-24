@@ -5,6 +5,7 @@
 #include "easy_equal.h"
 #include "easy_hash.h"
 #include "easy_lib.h"
+#include "easy_nothing.h"
 #include "easy_table.h"
 #include "easy_table_item.h"
 
@@ -48,8 +49,6 @@ struct IndexStatus {
 
 /// @brief  Get the position of the object or return the next empty/tombstone
 ///         position if not found.
-/// @note   This will panic if it receives a full hash table that does not
-///         contain the element for which we're looking.
 static struct IndexStatus
 get_wouldbe_position(struct EasyTable const *const me,
                      struct EasyGenericObject const *const key,
@@ -177,20 +176,39 @@ struct EasyGenericObject
 EasyTable__lookup(struct EasyTable const *const me,
                   struct EasyGenericObject const *const key)
 {
-    (void)me;
-    (void)key;
-    EASY_NOT_IMPLEMENTED();
-    return (struct EasyGenericObject){0};
+    uint64_t hash = EasyGenericObject__hash(key);
+    struct IndexStatus s = get_wouldbe_position(me, key, hash);
+    if (s.found) {
+        size_t i = s.idx;
+        EASY_ASSERT(i < me->capacity, "must in range");
+        EASY_ASSERT(me->data[i].valid, "must be valid");
+        return EasyGenericObject__copy(&me->data[i].value);
+    }
+    // TODO What should we return if there is nothing there?
+    return (struct EasyGenericObject){.type = EASY_NOTHING_TYPE,
+                                      .data = {.nothing = EasyNothing__new()}};
 }
 
-bool
+struct EasyTable
 EasyTable__remove(struct EasyTable const *const me,
                   struct EasyGenericObject const *const key)
 {
-    (void)me;
-    (void)key;
-    EASY_NOT_IMPLEMENTED();
-    return true;
+    uint64_t hash = EasyGenericObject__hash(key);
+    struct IndexStatus s = get_wouldbe_position(me, key, hash);
+    if (s.found) {
+        size_t i = s.idx;
+        EASY_ASSERT(i < me->capacity, "must in range");
+        EASY_ASSERT(me->data[i].valid, "must be valid");
+
+        // TODO Should we consider shrinking the array?
+        struct EasyTable new_me = EasyTable__copy(me);
+        EasyGenericObject__destroy(&new_me.data[i].key);
+        EasyGenericObject__destroy(&new_me.data[i].value);
+        new_me.data[i].valid = EASY_TABLE_TOMBSTONE;
+        new_me.data[i].hash = 0;
+        return new_me;
+    }
+    return EasyTable__copy(me);
 }
 
 struct EasyTable
