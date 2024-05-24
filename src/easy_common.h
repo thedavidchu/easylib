@@ -16,14 +16,14 @@ _easy_assert(int condition, char *msg, char *file, int line);
 
 /* We explicitly convert the condition to an int so that it will not cause
  * problems for the function call */
-#define EASY_ASSERT(condition, msg)                                            \
-    _easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
+#define EASY_ASSERT(condition, msg, ...)                                       \
+    _easy_assert((condition) ? 1 : 0, __FILE__, __LINE__, msg, __VA_ARGS__)
 /** Guard against erroneous inputs */
-#define EASY_GUARD(condition, msg)                                             \
-    _easy_assert((condition) ? 1 : 0, msg, __FILE__, __LINE__)
-#define EASY_IMPOSSIBLE() _easy_assert(0, "impossible!", __FILE__, __LINE__)
+#define EASY_GUARD(condition, msg, ...)                                        \
+    _easy_assert((condition) ? 1 : 0, __FILE__, __LINE__, msg, __VA_ARGS__)
+#define EASY_IMPOSSIBLE() _easy_assert(0, __FILE__, __LINE__, "impossible!")
 #define EASY_NOT_IMPLEMENTED()                                                 \
-    _easy_assert(0, "not implemented!", __FILE__, __LINE__)
+    _easy_assert(0, __FILE__, __LINE__, "not implemented!")
 
 /*******************************************************************************
  *  MEMORY MANAGEMENT
