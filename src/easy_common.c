@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,10 +17,19 @@ easy_print_error(char *msg, char *file, int line)
 }
 
 void
-_easy_assert(int condition, char *msg, char *file, int line)
+_easy_assert(int const condition,
+             char const *const file,
+             int const line,
+             char const *const msg,
+             ...)
 {
     if (!condition) {
-        easy_print_error(msg, file, line);
+        va_list ap;
+        va_start(ap, msg);
+        fprintf(stderr, "Error [%s:%d]: ", file, line);
+        vfprintf(stderr, msg, ap);
+        fprintf(stderr, "\n");
+        va_end(ap);
         exit(EXIT_FAILURE);
     }
 }
