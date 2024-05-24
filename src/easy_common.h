@@ -12,7 +12,11 @@
 void
 easy_print_error(char *msg, char *file, int line);
 void
-_easy_assert(int condition, char *msg, char *file, int line);
+_easy_assert(int const condition,
+             char const *const file,
+             int const line,
+             char const *const msg,
+             ...);
 
 /* We explicitly convert the condition to an int so that it will not cause
  * problems for the function call */
