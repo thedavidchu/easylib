@@ -3,3 +3,9 @@
 
 # easylib
 An easily understood generic library for C
+
+## Notable Features
+
+Objects are passed by value exclusively. This means that every "modification" is actually a new object.
+This simplifies ownership and resource management.
+Recall: my primary goal is eas of implementation and understanding.
