@@ -52,15 +52,20 @@ ez_calloc(size_t const nmemb, size_t const size)
     return (struct PointerResult){.status = my_errno, .ptr = ptr};
 }
 
+/// @brief  Behaves as 'realloc' except we define 'realloc(*, 0)' to be
+///         a 'free(*)'.
+/// @note   An unsuccessful 'realloc' will return NULL and leave the
+///         original pointer alone.
 static inline struct PointerResult
-ez_realloc(void *ptr, size_t const nmemb, size_t const size)
+ez_realloc(void *const ptr, size_t const nmemb, size_t const size)
 {
     struct SizeResult const num_bytes = safe_multiply(nmemb, size);
     if (num_bytes.overflow) {
         return (struct PointerResult){.status = EZ_STATUS_ERROR, .ptr = NULL};
     }
     if (num_bytes.result == 0) {
-        LOGGER_ERROR("undefined behaviour -- we will simply free the pointer");
+        LOGGER_WARN("undefined behaviour to pass 0 size to realloc -- we "
+                    "define it as a free");
         free(ptr);
         return (struct PointerResult){.status = OK, .ptr = NULL};
     }
@@ -69,5 +74,11 @@ ez_realloc(void *ptr, size_t const nmemb, size_t const size)
     int const my_errno = errno;
     restore_errno(old_errno);
     // This works in both the my_errno = 0 and my_errno != 0 case.
-    return (struct PointerResult){.status = my_errno, .ptr = ptr};
+    return (struct PointerResult){.status = my_errno, .ptr = my_ptr};
+}
+
+static inline void
+ez_free(void *const ptr)
+{
+    free(ptr);
 }
