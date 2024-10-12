@@ -23,7 +23,7 @@ safe_multiply(size_t const a, size_t const b)
 
 struct PointerResult {
     enum EzStatus const status;
-    void const *const ptr;
+    void *const ptr;
 };
 
 static inline struct PointerResult
@@ -34,7 +34,7 @@ ez_malloc(size_t const nmemb, size_t const size)
         return (struct PointerResult){.status = EZ_STATUS_ERROR, .ptr = NULL};
     }
     int const old_errno = save_and_reset_errno();
-    void const *const ptr = malloc(num_bytes.result);
+    void *const ptr = malloc(num_bytes.result);
     int const my_errno = errno;
     restore_errno(old_errno);
     // This works in both the my_errno = 0 and my_errno != 0 case.
@@ -45,7 +45,7 @@ static inline struct PointerResult
 ez_calloc(size_t const nmemb, size_t const size)
 {
     int const old_errno = save_and_reset_errno();
-    void const *const ptr = calloc(nmemb, size);
+    void *const ptr = calloc(nmemb, size);
     int const my_errno = errno;
     restore_errno(old_errno);
     // This works in both the my_errno = 0 and my_errno != 0 case.
@@ -70,7 +70,7 @@ ez_realloc(void *const ptr, size_t const nmemb, size_t const size)
         return (struct PointerResult){.status = OK, .ptr = NULL};
     }
     int const old_errno = save_and_reset_errno();
-    void const *const my_ptr = realloc(ptr, num_bytes.result);
+    void *const my_ptr = realloc(ptr, num_bytes.result);
     int const my_errno = errno;
     restore_errno(old_errno);
     // This works in both the my_errno = 0 and my_errno != 0 case.

@@ -33,4 +33,13 @@ logger_test_exe = executable(
     ],
 )
 
+memory_test_exe = executable(
+    'memory_test_exe',
+    'test/common/memory_test.c',
+    include_directories: [
+        include_directories('src')
+    ],
+)
+
 test('logger_test', logger_test_exe)
+test('memory_test', memory_test_exe)
