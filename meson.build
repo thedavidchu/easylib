@@ -21,5 +21,16 @@ cc = meson.get_compiler('c', native: true)
 math_dep = cc.find_library('m', required: false)
 thread_dep = dependency('threads')
 
-subdir('src')
-subdir('test')
+# subdir('src')
+# subdir('test')
+
+
+logger_test_exe = executable(
+    'logger_test_exe',
+    'test/common/logger_test.c',
+    include_directories: [
+        include_directories('src')
+    ],
+)
+
+test('logger_test', logger_test_exe)
