@@ -1,7 +1,7 @@
 # Clangd Language Server
 .cache
 .clangd
-compile_commands.json
+/build/
 
 # Prerequisites
 *.d
