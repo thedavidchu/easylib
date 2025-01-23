@@ -2,17 +2,25 @@ CC=gcc
 CFLAGS=-Wall -g
 
 .PHONY: all
-all: test_array test_table
+all: build object test_array test_table
+
+.PHONY: build
+build:
+	mkdir -p build
+
+.PHONY: object
+object: build
+	$(CC) $(CFLAGS) object.c -o build/object
 
 .PHONY: test_array
-test_array:
-	$(CC) $(CFLAGS) test_array.c array.c -o test_array
+test_array: build
+	$(CC) $(CFLAGS) test_array.c array.c -o build/test_array
 
 .PHONY: test_table
-test_table:
-	$(CC) $(CFLAGS) test_table.c table.c -o test_table
+test_table: build
+	$(CC) $(CFLAGS) test_table.c table.c -o build/test_table
 
 .PHONY: clean
 clean:
-	rm -rf test_array test_table
+	rm -rf build
 
