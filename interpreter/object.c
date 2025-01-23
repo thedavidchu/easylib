@@ -173,5 +173,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
 
 int main(void)
 {
+    struct BuiltinObjectTypes builtin_types = {0};
+    init_builtin_object_types(&builtin_types);
     return 0;
 }
