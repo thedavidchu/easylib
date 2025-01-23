@@ -1,6 +1,8 @@
-#pragma once
-
 #include <assert.h>
+#include <stdbool.h>
+#include <stddef.h>
+
+#include "object.h"
 
 enum BuiltinObjectType {
     OBJECT_TYPE_NOTHING,
@@ -13,20 +15,6 @@ enum BuiltinObjectType {
     OBJECT_TYPE_FUNCTION,
     // TODO
     OBJECT_TYPE_CUSTOM,
-};
-
-// Quick lookup - this is a singleton object!
-struct BuiltinObjectTypes {
-    struct ObjectType nothing;
-    struct ObjectType boolean;
-    struct ObjectType number;
-    struct ObjectType string;
-    struct ObjectType array;
-    struct ObjectType table;
-    // TODO
-    struct ObjectType function;
-    // TODO
-    struct ObjectType custom;
 };
 
 struct ObjectType {
@@ -61,6 +49,20 @@ struct ObjectType {
     int (*truthiness)(struct Object const *const, bool *const result);
     // Function (takes 1 argument, may be an array)
     int (*call)(struct Object const *const, struct Object *const arg, struct Object **const result);
+};
+
+// Quick lookup - this is a singleton object!
+struct BuiltinObjectTypes {
+    struct ObjectType nothing;
+    struct ObjectType boolean;
+    struct ObjectType number;
+    struct ObjectType string;
+    struct ObjectType array;
+    struct ObjectType table;
+    // TODO
+    struct ObjectType function;
+    // TODO
+    struct ObjectType custom;
 };
 
 union ObjectData {
@@ -103,7 +105,7 @@ int phony_and(struct Object const *const, struct Object const *const, bool *cons
 int phony_or(struct Object const *const, struct Object const *const, bool *const result) { return -100; }
 int phony_truthiness(struct Object const *const, bool *const result) { return -100; }
 // Function
-int call(struct Object const *const, struct Object *const arg, struct Object **const result) { return -100; }
+int phony_call(struct Object const *const, struct Object *const arg, struct Object **const result) { return -100; }
 
 
 /// @note   This is for the sole purpose of checking that we initialize all fields.
@@ -169,3 +171,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
     types->custom = new_object_type(OBJECT_TYPE_CUSTOM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 }
 
+int main(void)
+{
+    return 0;
+}
