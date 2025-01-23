@@ -34,7 +34,7 @@ enum BuiltinObjectType {
 struct ObjectType {
     enum BuiltinObjectType type;
     /// @brief Construct an object.
-    int (*ctor)(struct Object *const, union ObjectData);
+    int (*ctor)(struct Object *const, struct ObjectType const *const, union ObjectData);
     /// @brief Destroy an object.
     int (*dtor)(struct Object *const);
     /// @brief Compare two objects.
@@ -81,7 +81,7 @@ struct BuiltinObjectTypes {
 
 
 struct Object {
-    struct ObjectType *type;
+    struct ObjectType const *type;
     union ObjectData data;
 };
 
@@ -89,7 +89,7 @@ struct Object {
 struct ObjectType
 new_object_type(
     enum BuiltinObjectType type,
-    int (*ctor)(struct Object *const, union ObjectData),
+    int (*ctor)(struct Object *const, struct ObjectType const *const, union ObjectData),
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result),
     // String, array, or table
@@ -113,7 +113,7 @@ new_object_type(
 );
 
 // All objects
-int phony_ctor(struct Object *const, union ObjectData);
+int phony_ctor(struct Object *const, struct ObjectType const *const type, union ObjectData);
 int phony_dtor(struct Object *const);
 int phony_cmp(struct Object const *const, struct Object const *const, int *const result);
 // String, array, or table

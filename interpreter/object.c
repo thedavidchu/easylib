@@ -3,10 +3,13 @@
 #include <stddef.h>
 
 #include "object.h"
+#include "nothing.h"
+#include "number.h"
+#include "boolean.h"
 
 // NOTE I picked -100 for the return value because I wanted something unique. #YOLO!
 // All objects
-int phony_ctor(struct Object *const me, union ObjectData data) { (void)me; (void)data; return -100; }
+int phony_ctor(struct Object *const me, struct ObjectType const *const type, union ObjectData data) { (void)me; (void)type; (void)data; return -100; }
 int phony_dtor(struct Object *const me) { return -100; }
 int phony_cmp(struct Object const *const me, struct Object const *const other, int *const result) { return -100; }
 // String, array, or table
@@ -33,7 +36,7 @@ int phony_call(struct Object const *const me, struct Object *const arg, struct O
 struct ObjectType
 new_object_type(
     enum BuiltinObjectType type,
-    int (*ctor)(struct Object *const, union ObjectData),
+    int (*ctor)(struct Object *const, struct ObjectType const *const type, union ObjectData),
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result),
     // String, array, or table
@@ -58,9 +61,9 @@ new_object_type(
 {
     return (struct ObjectType){
         .type = type,
-        .ctor = ctor,
-        .dtor = dtor,
-        .cmp = cmp,
+        .ctor = ctor ? ctor : phony_ctor,
+        .dtor = dtor ? dtor : phony_dtor,
+        .cmp = cmp ? cmp : phony_cmp,
         .len = len ? len : phony_len,
         .cap = cap ? cap : phony_cap,
         .insert = insert ? insert : phony_insert,
@@ -82,9 +85,9 @@ void
 init_builtin_object_types(struct BuiltinObjectTypes *const types)
 {
     // TODO
-    types->nothing = new_object_type(OBJECT_TYPE_NOTHING, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->number = new_object_type(OBJECT_TYPE_NUMBER, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->string = new_object_type(OBJECT_TYPE_STRING, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->table = new_object_type(OBJECT_TYPE_TABLE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
