@@ -54,3 +54,54 @@ boolean_fprint(struct Object const *const me, FILE *const fp, bool const newline
     fprintf(fp, "%s%s", me->data.boolean ? "true" : "false", newline ? "\n" : "");
     return 0;
 }
+
+static int
+generic_boolean_op(struct Object const *const lhs, struct Object const *const rhs, bool *const result, int const op)
+{
+    int err = 0;
+    if ((err = boolean_error(lhs))) { return err; }
+    if ((err = boolean_error(rhs))) { return err; }
+    bool ans = false;
+    switch (op) {
+    case 0:
+        ans = lhs->data.boolean && rhs->data.boolean;
+        break;
+    case 1:
+        ans = lhs->data.boolean || rhs->data.boolean;
+        break;
+    default:
+        return -1;
+    }
+    *result = ans;
+    return 0;
+}
+
+int
+boolean_not(struct Object const *const me,  bool *const result)
+{
+    int err = 0;
+    if ((err = boolean_error(me))) { return err; }
+    *result = !me->data.boolean;
+    return 0;
+}
+
+int
+boolean_and(struct Object const *const me, struct Object const *const other, bool *const result)
+{
+    return generic_boolean_op(me, other, result, 0);
+}
+
+int
+boolean_or(struct Object const *const me, struct Object const *const other, bool *const result)
+{
+    return generic_boolean_op(me, other, result, 1);
+}
+
+int
+boolean_truthiness(struct Object const *const me,  bool *const result)
+{
+    int err = 0;
+    if ((err = boolean_error(me))) { return err; }
+    *result = me->data.boolean;
+    return 0;
+}

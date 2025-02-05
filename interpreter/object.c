@@ -28,7 +28,7 @@ int phony_sub(struct Object const *const me, struct Object const *const other, s
 int phony_mul(struct Object const *const me, struct Object const *const other, struct Object **const result) { return -100; }
 int phony_div(struct Object const *const me, struct Object const *const other, struct Object **const result) { return -100; }
 // Boolean
-int phony_not(struct Object const *const me, struct Object const *const other, bool *const result) { return -100; }
+int phony_not(struct Object const *const me, bool *const result) { return -100; }
 int phony_and(struct Object const *const me, struct Object const *const other, bool *const result) { return -100; }
 int phony_or(struct Object const *const me, struct Object const *const other, bool *const result) { return -100; }
 int phony_truthiness(struct Object const *const me, bool *const result) { return -100; }
@@ -56,7 +56,7 @@ new_object_type(
     int (*mul)(struct Object const *const, struct Object const *const, struct Object **const),
     int (*div)(struct Object const *const, struct Object const *const, struct Object **const),
     // Boolean
-    int (*not)(struct Object const *const, struct Object const *const, bool *const result),
+    int (*not)(struct Object const *const, bool *const result),
     int (*and)(struct Object const *const, struct Object const *const, bool *const result),
     int (*or)(struct Object const *const, struct Object const *const, bool *const result),
     int (*truthiness)(struct Object const *const, bool *const result),
@@ -92,7 +92,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
 {
     // TODO
     types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, nothing_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, boolean_not, boolean_and, boolean_or, boolean_truthiness, NULL);
     types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, number_fprint, NULL, NULL, NULL, NULL, NULL, number_add, number_sub, number_mul, number_div, NULL, NULL, NULL, NULL, NULL);
     types->string = new_object_type(OBJECT_TYPE_STRING, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);

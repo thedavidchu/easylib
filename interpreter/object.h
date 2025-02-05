@@ -70,7 +70,7 @@ struct ObjectType {
     int (*mul)(struct Object const *const, struct Object const *const, struct Object **const);
     int (*div)(struct Object const *const, struct Object const *const, struct Object **const);
     // Boolean
-    int (*not)(struct Object const *const, struct Object const *const, bool *const result);
+    int (*not)(struct Object const *const, bool *const result);
     int (*and)(struct Object const *const, struct Object const *const, bool *const result);
     int (*or)(struct Object const *const, struct Object const *const, bool *const result);
     int (*truthiness)(struct Object const *const, bool *const result);
@@ -118,7 +118,7 @@ new_object_type(
     int (*mul)(struct Object const *const, struct Object const *const, struct Object **const),
     int (*div)(struct Object const *const, struct Object const *const, struct Object **const),
     // Boolean
-    int (*not)(struct Object const *const, struct Object const *const, bool *const result),
+    int (*not)(struct Object const *const, bool *const result),
     int (*and)(struct Object const *const, struct Object const *const, bool *const result),
     int (*or)(struct Object const *const, struct Object const *const, bool *const result),
     int (*truthiness)(struct Object const *const, bool *const result),
@@ -143,7 +143,7 @@ int phony_sub(struct Object const *const, struct Object const *const, struct Obj
 int phony_mul(struct Object const *const, struct Object const *const, struct Object **const);
 int phony_div(struct Object const *const, struct Object const *const, struct Object **const);
 // Boolean
-int phony_not(struct Object const *const, struct Object const *const, bool *const result);
+int phony_not(struct Object const *const, bool *const result);
 int phony_and(struct Object const *const, struct Object const *const, bool *const result);
 int phony_or(struct Object const *const, struct Object const *const, bool *const result);
 int phony_truthiness(struct Object const *const, bool *const result);
