@@ -1,9 +1,24 @@
+#pragma once
+
+#include <stdbool.h>
+#include <stdio.h>
+
 #include "array.h"
+
+static int
+nothing_error(struct Object const *const me)
+{
+    if (me == NULL) { return -1; }
+    if (me->type == NULL) { return -1; }
+    if (me->type->type != OBJECT_TYPE_NOTHING) { return -1; }
+    if (me->data.nothing != NULL) { return -1; }
+    return 0;
+}
 
 int
 nothing_ctor(struct Object *me, struct ObjectType const *const type, union ObjectData data)
 {
-    if (me == NULL) { return -1; }
+    if (me == NULL || type == NULL) { return -1; }
     me->type = type;
     // TODO Check if data is valid.
     me->data = data;
@@ -13,8 +28,8 @@ nothing_ctor(struct Object *me, struct ObjectType const *const type, union Objec
 int
 nothing_dtor(struct Object *me)
 {
-    if (me == NULL) { return -1; }
-    if (me->type->type != OBJECT_TYPE_BOOLEAN) { return -1; }
+    int err = 0;
+    if ((err = nothing_error(me))) { return err; }
     *me = (struct Object){0};
     return 0;
 }
@@ -22,6 +37,8 @@ nothing_dtor(struct Object *me)
 int
 nothing_cmp(struct Object const *me, struct Object const *other, int *result)
 {
+    int err = 0;
+    if ((err = nothing_error(me))) { return err; }
     if (me == NULL || other == NULL || result == NULL) { return -1; }
     if (me->type->type != OBJECT_TYPE_NOTHING) { return -1; }
     if (me == other) { *result = 0; return 0; }
@@ -29,3 +46,13 @@ nothing_cmp(struct Object const *me, struct Object const *other, int *result)
     *result = 3;
     return 0;
 }
+
+int
+nothing_fprint(struct Object const *const me, FILE *const fp, bool const newline)
+{
+    int err = 0;
+    if ((err = nothing_error(me))) { return err; }
+    fprintf(fp, "Nothing%s", newline ? "\n" : "");
+    return 0;
+}
+

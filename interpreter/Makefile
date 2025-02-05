@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -g
 
 .PHONY: all
-all: build object test_array test_table
+all: clean build object test_array test_table
 
 .PHONY: build
 build:
@@ -19,6 +19,10 @@ test_array: build
 .PHONY: test_table
 test_table: build
 	$(CC) $(CFLAGS) test_table.c table.c -o build/test_table
+
+.PHONY: object
+test_table: build
+	$(CC) $(CFLAGS) object.c -o build/object
 
 .PHONY: clean
 clean:

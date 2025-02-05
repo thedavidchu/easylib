@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 
 struct Object;
 union ObjectData {
@@ -45,6 +46,8 @@ struct ObjectType {
     /// * +3 => not-{lesser,greater} but not-equal
     /// * +4 => not-comparable
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result);
+    /// @brief Print an object
+    int (*fprint)(struct Object const *const, FILE *const fp, bool const newline);
     // String, array, or table
     int (*len)(struct Object const *const, size_t *const result);
     int (*cap)(struct Object const *const, size_t *const result);
@@ -92,6 +95,7 @@ new_object_type(
     int (*ctor)(struct Object *const, struct ObjectType const *const, union ObjectData),
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result),
+    int (*fprint)(struct Object const *const, FILE *const fp, bool const newline),
     // String, array, or table
     int (*len)(struct Object const *const, size_t *const result),
     int (*cap)(struct Object const *const, size_t *const result),
@@ -116,6 +120,7 @@ new_object_type(
 int phony_ctor(struct Object *const, struct ObjectType const *const type, union ObjectData);
 int phony_dtor(struct Object *const);
 int phony_cmp(struct Object const *const, struct Object const *const, int *const result);
+int fprint(struct Object const *const me, FILE *const fp, bool const newline);
 // String, array, or table
 int phony_len(struct Object const *const, size_t *const result);
 int phony_cap(struct Object const *const, size_t *const result);
