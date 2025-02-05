@@ -22,22 +22,6 @@ number_ctor(struct Object *me, struct ObjectType const *const type, union Object
     return 0;
 }
 
-/// @brief Create a new Number object with the default value of 0.0.
-static struct Object *
-new_number(struct ObjectType const *const type, double const default_value)
-{
-    int err = 0;
-    if (type == NULL || type->type != OBJECT_TYPE_NUMBER) { return NULL; }
-    struct Object *optr = calloc(1, sizeof(*optr));
-    // NOTE I'm not sure if assert(...) can change the errno.
-    if (optr == NULL) { err = errno; assert(err != 0); return NULL; }
-    if ((err = number_ctor(optr, type, (union ObjectData){.number = default_value}))) {
-        free(optr);
-        return NULL;
-    }
-    return optr;
-}
-
 int
 number_dtor(struct Object *me)
 {
@@ -73,7 +57,7 @@ number_fprint(struct Object const *const me, FILE *const fp, bool const newline)
 }
 
 static int
-generic_number_op(struct Object const *const lhs, struct Object const *const rhs, struct Object **const result, int const op)
+generic_number_op(struct Object const *const lhs, struct Object const *const rhs, struct Object *const result, int const op)
 {
     int err = 0;
     if ((err = number_error(lhs))) { return err; }
@@ -95,32 +79,30 @@ generic_number_op(struct Object const *const lhs, struct Object const *const rhs
     default:
         return -1;
     }
-    struct Object *optr = new_number(lhs->type, ans);
-    if (optr == NULL) { return err; }
-    *result = optr;
+    if ((err = number_ctor(result, lhs->type, (union ObjectData){.number = ans})));
     return 0;
 }
 
 int
-number_add(struct Object const *const me, struct Object const *const other, struct Object **const result)
+number_add(struct Object const *const me, struct Object const *const other, struct Object *const result)
 {
     return generic_number_op(me, other, result, 0);
 }
 
 int
-number_sub(struct Object const *const me, struct Object const *const other, struct Object **const result)
+number_sub(struct Object const *const me, struct Object const *const other, struct Object *const result)
 {
     return generic_number_op(me, other, result, 1);
 }
 
 int
-number_mul(struct Object const *const me, struct Object const *const other, struct Object **const result)
+number_mul(struct Object const *const me, struct Object const *const other, struct Object *const result)
 {
     return generic_number_op(me, other, result, 2);
 }
 
 int
-number_div(struct Object const *const me, struct Object const *const other, struct Object **const result)
+number_div(struct Object const *const me, struct Object const *const other, struct Object *const result)
 {
     return generic_number_op(me, other, result, 3);
 }

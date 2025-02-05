@@ -23,17 +23,17 @@ int phony_insert(struct Object *const me, size_t const idx, struct Object *const
 int phony_get(struct Object *const me, size_t const idx, struct Object **const result) { return -100; }
 int phony_remove(struct Object *const me, size_t const idx, struct Object **const result) { return -100; }
 // Number
-int phony_add(struct Object const *const me, struct Object const *const other, struct Object **const result) { return -100; }
-int phony_sub(struct Object const *const me, struct Object const *const other, struct Object **const result) { return -100; }
-int phony_mul(struct Object const *const me, struct Object const *const other, struct Object **const result) { return -100; }
-int phony_div(struct Object const *const me, struct Object const *const other, struct Object **const result) { return -100; }
+int phony_add(struct Object const *const me, struct Object const *const other, struct Object *const result) { return -100; }
+int phony_sub(struct Object const *const me, struct Object const *const other, struct Object *const result) { return -100; }
+int phony_mul(struct Object const *const me, struct Object const *const other, struct Object *const result) { return -100; }
+int phony_div(struct Object const *const me, struct Object const *const other, struct Object *const result) { return -100; }
 // Boolean
 int phony_not(struct Object const *const me, bool *const result) { return -100; }
 int phony_and(struct Object const *const me, struct Object const *const other, bool *const result) { return -100; }
 int phony_or(struct Object const *const me, struct Object const *const other, bool *const result) { return -100; }
 int phony_truthiness(struct Object const *const me, bool *const result) { return -100; }
 // Function
-int phony_call(struct Object const *const me, struct Object *const arg, struct Object **const result) { return -100; }
+int phony_call(struct Object const *const me, struct Object *const arg, struct Object *const result) { return -100; }
 
 
 /// @note   This is for the sole purpose of checking that we initialize all fields.
@@ -51,17 +51,17 @@ new_object_type(
     int (*get)(struct Object *const, size_t const idx, struct Object **const),
     int (*remove)(struct Object *const, size_t const idx, struct Object **const),
     // Number
-    int (*add)(struct Object const *const, struct Object const *const, struct Object **const),
-    int (*sub)(struct Object const *const, struct Object const *const, struct Object **const),
-    int (*mul)(struct Object const *const, struct Object const *const, struct Object **const),
-    int (*div)(struct Object const *const, struct Object const *const, struct Object **const),
+    int (*add)(struct Object const *const, struct Object const *const, struct Object *const),
+    int (*sub)(struct Object const *const, struct Object const *const, struct Object *const),
+    int (*mul)(struct Object const *const, struct Object const *const, struct Object *const),
+    int (*div)(struct Object const *const, struct Object const *const, struct Object *const),
     // Boolean
     int (*not)(struct Object const *const, bool *const result),
     int (*and)(struct Object const *const, struct Object const *const, bool *const result),
     int (*or)(struct Object const *const, struct Object const *const, bool *const result),
     int (*truthiness)(struct Object const *const, bool *const result),
     // Function
-    int (*call)(struct Object const *const, struct Object *const arg, struct Object **const result)
+    int (*call)(struct Object const *const, struct Object *const arg, struct Object *const result)
 )
 {
     return (struct ObjectType){
@@ -101,6 +101,108 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
     types->custom = new_object_type(OBJECT_TYPE_CUSTOM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 }
 
+static int
+test_boolean_op(struct BuiltinObjectTypes const *const builtin_types,
+               char const op,
+               double const lhs,
+               double const rhs,
+               double const expected,
+               FILE *const fp)
+{
+    struct Object x = {0}, y = {0};
+    bool r = false;
+    builtin_types->boolean.ctor(&x, &builtin_types->boolean, (union ObjectData){.boolean = lhs});
+    builtin_types->boolean.ctor(&y, &builtin_types->boolean, (union ObjectData){.boolean = rhs});
+    switch (op) {
+    case ' ':
+        x.type->truthiness(&x, &r);
+        if (fp) {
+            x.type->fprint(&x, fp, false);
+            fprintf(fp, " = %s\n", bool_stringify(r));
+        }
+        assert(x.data.boolean == r);
+        break;
+    case '!':
+        x.type->not(&x, &r);
+        if (fp) {
+            fprintf(fp, "!");
+            x.type->fprint(&x, fp, false);
+            fprintf(fp, " = %s\n", bool_stringify(r));
+        }
+        assert(!x.data.boolean == r);
+        break;
+    case '&':
+        x.type->and(&x, &y, &r);
+        if (fp) {
+            x.type->fprint(&x, fp, false);
+            fprintf(fp, " && ");
+            y.type->fprint(&y, fp, false);
+            fprintf(fp, " = %s\n", bool_stringify(r));
+        }
+        assert((x.data.boolean && y.data.boolean) == r);
+        break;
+    case '|':
+        x.type->or(&x, &y, &r);
+        if (fp) {
+            x.type->fprint(&x, fp, false);
+            fprintf(fp, " || ");
+            y.type->fprint(&y, fp, false);
+            fprintf(fp, " = %s\n", bool_stringify(r));
+        }
+        assert((x.data.boolean || y.data.boolean) == r);
+        break;
+    default:
+        return -1;
+    }
+    x.type->dtor(&x);
+    y.type->dtor(&y);
+    return 0;
+}
+
+static int
+test_number_op(struct BuiltinObjectTypes const *const builtin_types,
+               char const op,
+               double const lhs,
+               double const rhs,
+               double const expected,
+               FILE *const fp)
+{
+    struct Object x = {0}, y = {0}, r = {0};
+    builtin_types->number.ctor(&x, &builtin_types->number, (union ObjectData){.number = lhs});
+    builtin_types->number.ctor(&y, &builtin_types->number, (union ObjectData){.number = rhs});
+    switch (op) {
+    case '+':
+        x.type->add(&x, &y, &r);
+        assert(x.data.number + y.data.number == r.data.number);
+        break;
+    case '-':
+        x.type->sub(&x, &y, &r);
+        assert(x.data.number - y.data.number == r.data.number);
+        break;
+    case '*':
+        x.type->mul(&x, &y, &r);
+        assert(x.data.number * y.data.number == r.data.number);
+        break;
+    case '/':
+        x.type->div(&x, &y, &r);
+        assert(x.data.number / y.data.number == r.data.number);
+        break;
+    default:
+        return -1;
+    }
+    if (fp) {
+        x.type->fprint(&x, fp, false);
+        fprintf(fp, " %c ", op);
+        y.type->fprint(&y, fp, false);
+        fprintf(fp, " = ");
+        r.type->fprint(&r, fp, true);
+    }
+    x.type->dtor(&x);
+    y.type->dtor(&y);
+    r.type->dtor(&r);
+    return 0;
+}
+
 int main(void)
 {
     // TODO Make global state object.
@@ -121,6 +223,19 @@ int main(void)
     boolean.type->fprint(&boolean, stdout, true);
     boolean.type->dtor(&boolean);
 
+    test_boolean_op(&builtin_types, ' ', true, 0, true, stdout);
+    test_boolean_op(&builtin_types, ' ', false, 0, false, stdout);
+    test_boolean_op(&builtin_types, '!', true, 0, false, stdout);
+    test_boolean_op(&builtin_types, '!', false, 0, true, stdout);
+    test_boolean_op(&builtin_types, '&', true, true, true, stdout);
+    test_boolean_op(&builtin_types, '&', true, false, false, stdout);
+    test_boolean_op(&builtin_types, '&', false, true, false, stdout);
+    test_boolean_op(&builtin_types, '&', false, false, false, stdout);
+    test_boolean_op(&builtin_types, '|', true, true, true, stdout);
+    test_boolean_op(&builtin_types, '|', true, false, true, stdout);
+    test_boolean_op(&builtin_types, '|', false, true, true, stdout);
+    test_boolean_op(&builtin_types, '|', false, false, false, stdout);
+
     // Test Number
     struct Object number = {0};
     builtin_types.boolean.ctor(&number, &builtin_types.number, (union ObjectData){.number = 0.0});
@@ -135,16 +250,10 @@ int main(void)
     number.type->fprint(&number, stdout, true);
     number.type->dtor(&number);
 
-    struct Object one = {0};
-    struct Object *number_result = NULL;
-    builtin_types.number.ctor(&one, &builtin_types.number, (union ObjectData){.number = 1.0});
-    one.type->fprint(&one, stdout, true);
-    one.type->add(&one, &one, &number_result);
-    one.type->fprint(number_result, stdout, true);
-
-    one.type->dtor(&one);
-    number_result->type->dtor(number_result);
-    free(number_result);
+    test_number_op(&builtin_types, '+', 1.0, 1.0, 2.0, stdout);
+    test_number_op(&builtin_types, '-', 1.0, 1.0, 0.0, stdout);
+    test_number_op(&builtin_types, '*', 1.0, 1.0, 1.0, stdout);
+    test_number_op(&builtin_types, '/', 1.0, 1.0, 1.0, stdout);
 
     return 0;
 }

@@ -5,6 +5,12 @@
 
 #include "object.h"
 
+static inline char const *
+bool_stringify(bool const x)
+{
+    return x ? "true" : "false";
+}
+
 static int
 boolean_error(struct Object const *const me)
 {
@@ -51,7 +57,7 @@ boolean_fprint(struct Object const *const me, FILE *const fp, bool const newline
     int err = 0;
     if ((err = boolean_error(me))) { return err; }
     // TODO Handle errors in fprintf(...).
-    fprintf(fp, "%s%s", me->data.boolean ? "true" : "false", newline ? "\n" : "");
+    fprintf(fp, "%s%s", bool_stringify(me->data.boolean), newline ? "\n" : "");
     return 0;
 }
 
