@@ -1,3 +1,6 @@
+# My files
+/interpreter/build/
+
 # Clangd Language Server
 .cache
 .clangd
