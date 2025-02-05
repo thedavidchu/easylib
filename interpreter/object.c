@@ -90,7 +90,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
 {
     // TODO
     types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, nothing_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->string = new_object_type(OBJECT_TYPE_STRING, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -101,10 +101,22 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
 
 int main(void)
 {
+    // TODO Make global state object.
     struct BuiltinObjectTypes builtin_types = {0};
     init_builtin_object_types(&builtin_types);
+
+    // Test Nothing
     struct Object nothing = {0};
     builtin_types.nothing.ctor(&nothing, &builtin_types.nothing, (union ObjectData){.nothing = NULL});
     nothing.type->fprint(&nothing, stdout, true);
+    nothing.type->dtor(&nothing);
+
+    // Test Boolean
+    struct Object boolean = {0};
+    builtin_types.boolean.ctor(&boolean, &builtin_types.boolean, (union ObjectData){.boolean = false});
+    boolean.type->fprint(&boolean, stdout, true);
+    boolean.data.boolean = true;
+    boolean.type->fprint(&boolean, stdout, true);
+    boolean.type->dtor(&boolean);
     return 0;
 }
