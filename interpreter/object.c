@@ -1,7 +1,9 @@
 #include <assert.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "object.h"
 #include "nothing.h"
@@ -91,7 +93,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
     // TODO
     types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, nothing_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, number_fprint, NULL, NULL, NULL, NULL, NULL, number_add, number_sub, number_mul, number_div, NULL, NULL, NULL, NULL, NULL);
     types->string = new_object_type(OBJECT_TYPE_STRING, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->table = new_object_type(OBJECT_TYPE_TABLE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -118,5 +120,31 @@ int main(void)
     boolean.data.boolean = true;
     boolean.type->fprint(&boolean, stdout, true);
     boolean.type->dtor(&boolean);
+
+    // Test Number
+    struct Object number = {0};
+    builtin_types.boolean.ctor(&number, &builtin_types.number, (union ObjectData){.number = 0.0});
+    number.type->fprint(&number, stdout, true);
+    number.data.number = 1.0;
+    number.type->fprint(&number, stdout, true);
+    number.data.number = 3.14;
+    number.type->fprint(&number, stdout, true);
+    number.data.number = INFINITY;
+    number.type->fprint(&number, stdout, true);
+    number.data.number = NAN;
+    number.type->fprint(&number, stdout, true);
+    number.type->dtor(&number);
+
+    struct Object one = {0};
+    struct Object *number_result = NULL;
+    builtin_types.number.ctor(&one, &builtin_types.number, (union ObjectData){.number = 1.0});
+    one.type->fprint(&one, stdout, true);
+    one.type->add(&one, &one, &number_result);
+    one.type->fprint(number_result, stdout, true);
+
+    one.type->dtor(&one);
+    number_result->type->dtor(number_result);
+    free(number_result);
+
     return 0;
 }

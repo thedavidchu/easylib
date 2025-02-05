@@ -1,8 +1,16 @@
 #pragma once
 
 #include <assert.h>
+#include <errno.h>
 
 #include "object.h"
+
+static int
+number_error(struct Object const *const me)
+{
+    if (me == NULL || me->type == NULL || me->type->type != OBJECT_TYPE_NUMBER) { return -1; }
+    return 0;
+}
 
 int
 number_ctor(struct Object *me, struct ObjectType const *const type, union ObjectData data)
@@ -14,11 +22,27 @@ number_ctor(struct Object *me, struct ObjectType const *const type, union Object
     return 0;
 }
 
+/// @brief Create a new Number object with the default value of 0.0.
+static struct Object *
+new_number(struct ObjectType const *const type, double const default_value)
+{
+    int err = 0;
+    if (type == NULL || type->type != OBJECT_TYPE_NUMBER) { return NULL; }
+    struct Object *optr = calloc(1, sizeof(*optr));
+    // NOTE I'm not sure if assert(...) can change the errno.
+    if (optr == NULL) { err = errno; assert(err != 0); return NULL; }
+    if ((err = number_ctor(optr, type, (union ObjectData){.number = default_value}))) {
+        free(optr);
+        return NULL;
+    }
+    return optr;
+}
+
 int
 number_dtor(struct Object *me)
 {
-    if (me == NULL) { return -1; }
-    if (me->type->type != OBJECT_TYPE_NUMBER) { return -1; }
+    int err = 0;
+    if ((err = number_error(me))) { return err; }
     *me = (struct Object){0};
     return 0;
 }
@@ -26,6 +50,8 @@ number_dtor(struct Object *me)
 int
 number_cmp(struct Object const *me, struct Object const *other, int *result)
 {
+    int err = 0;
+    if ((err = number_error(me))) { return err; }
     if (me == NULL || other == NULL || result == NULL) { return -1; }
     if (me->type->type != OBJECT_TYPE_NUMBER) { return -1; }
     if (me == other) { *result = 0; return 0; }
@@ -34,4 +60,67 @@ number_cmp(struct Object const *me, struct Object const *other, int *result)
     if (me->data.number == other->data.number) { *result = 1; return 0; }
     if (me->data.number > other->data.number) { *result = 2; return 0; }
     assert(0 && "impossible");
+}
+
+int
+number_fprint(struct Object const *const me, FILE *const fp, bool const newline)
+{
+    int err = 0;
+    if ((err = number_error(me))) { return err; }
+    // TODO Handle errors in fprintf(...).
+    fprintf(fp, "%f%s", me->data.number, newline ? "\n" : "");
+    return 0;
+}
+
+static int
+generic_number_op(struct Object const *const lhs, struct Object const *const rhs, struct Object **const result, int const op)
+{
+    int err = 0;
+    if ((err = number_error(lhs))) { return err; }
+    if ((err = number_error(rhs))) { return err; }
+    double ans = 0.0;
+    switch (op) {
+    case 0:
+        ans = lhs->data.number + rhs->data.number;
+        break;
+    case 1:
+        ans = lhs->data.number - rhs->data.number;
+        break;
+    case 2:
+        ans = lhs->data.number * rhs->data.number;
+        break;
+    case 3:
+        ans = lhs->data.number * rhs->data.number;
+        break;
+    default:
+        return -1;
+    }
+    struct Object *optr = new_number(lhs->type, ans);
+    if (optr == NULL) { return err; }
+    *result = optr;
+    return 0;
+}
+
+int
+number_add(struct Object const *const me, struct Object const *const other, struct Object **const result)
+{
+    return generic_number_op(me, other, result, 0);
+}
+
+int
+number_sub(struct Object const *const me, struct Object const *const other, struct Object **const result)
+{
+    return generic_number_op(me, other, result, 1);
+}
+
+int
+number_mul(struct Object const *const me, struct Object const *const other, struct Object **const result)
+{
+    return generic_number_op(me, other, result, 2);
+}
+
+int
+number_div(struct Object const *const me, struct Object const *const other, struct Object **const result)
+{
+    return generic_number_op(me, other, result, 3);
 }
