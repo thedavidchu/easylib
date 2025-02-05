@@ -1,3 +1,12 @@
+/**
+ * TODO
+ *  - Global Object
+ *      - Initialize objects with a pointer to the global object
+ *      - This global object stores builtin types, singleton objects, etc.
+ *  - Decide where to allocate memory...
+ *      - Should we modify an existing object or a pointer to an object?
+ *      - i.e. 'struct Object *const' OR 'struct Object **const'?
+ **/
 #pragma once
 
 #include <assert.h>
@@ -45,6 +54,7 @@ struct ObjectType {
     /// * +2 => greater
     /// * +3 => not-{lesser,greater} but not-equal
     /// * +4 => not-comparable
+    /// TODO - Put this into a enumeration.
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result);
     /// @brief Print an object
     int (*fprint)(struct Object const *const, FILE *const fp, bool const newline);
