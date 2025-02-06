@@ -9,6 +9,7 @@
 #include "nothing.h"
 #include "number.h"
 #include "boolean.h"
+#include "string.h"
 
 // NOTE I picked -100 for the return value because I wanted something unique. #YOLO!
 // All objects
@@ -21,6 +22,7 @@ int phony_len(struct Object const *const me, size_t *const result) { return -100
 int phony_cap(struct Object const *const me, size_t *const result) { return -100; }
 int phony_insert(struct Object *const me, size_t const idx, struct Object *const result) { return -100; }
 int phony_get(struct Object *const me, size_t const idx, struct Object **const result) { return -100; }
+int phony_slice(struct Object const *const, size_t const start, size_t const end, struct Object *const) { return -100; }
 int phony_remove(struct Object *const me, size_t const idx, struct Object **const result) { return -100; }
 // Number
 int phony_add(struct Object const *const me, struct Object const *const other, struct Object *const result) { return -100; }
@@ -49,6 +51,7 @@ new_object_type(
     int (*cap)(struct Object const *const, size_t *const result),
     int (*insert)(struct Object *const, size_t const idx, struct Object *const),
     int (*get)(struct Object *const, size_t const idx, struct Object **const),
+    int (*slice)(struct Object const *const, size_t const start, size_t const end, struct Object *const),
     int (*remove)(struct Object *const, size_t const idx, struct Object **const),
     // Number
     int (*add)(struct Object const *const, struct Object const *const, struct Object *const),
@@ -74,6 +77,7 @@ new_object_type(
         .cap = cap ? cap : phony_cap,
         .insert = insert ? insert : phony_insert,
         .get = get ? get : phony_get,
+        .slice = slice ? slice : phony_slice,
         .remove = remove ? remove : phony_remove,
         .add = add ? add : phony_add,
         .sub = sub ? sub : phony_sub,
@@ -91,14 +95,14 @@ void
 init_builtin_object_types(struct BuiltinObjectTypes *const types)
 {
     // TODO
-    types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, nothing_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, boolean_not, boolean_and, boolean_or, boolean_truthiness, NULL);
-    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, number_fprint, NULL, NULL, NULL, NULL, NULL, number_add, number_sub, number_mul, number_div, NULL, NULL, NULL, NULL, NULL);
-    types->string = new_object_type(OBJECT_TYPE_STRING, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->table = new_object_type(OBJECT_TYPE_TABLE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->function = new_object_type(OBJECT_TYPE_FUNCTION, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->custom = new_object_type(OBJECT_TYPE_CUSTOM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, nothing_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, boolean_not, boolean_and, boolean_or, boolean_truthiness, NULL);
+    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, number_fprint, NULL, NULL, NULL, NULL, NULL, NULL, number_add, number_sub, number_mul, number_div, NULL, NULL, NULL, NULL, NULL);
+    types->string = new_object_type(OBJECT_TYPE_STRING, string_ctor, string_dtor, string_cmp, string_fprint, string_len, NULL, NULL, NULL, string_slice, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->table = new_object_type(OBJECT_TYPE_TABLE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->function = new_object_type(OBJECT_TYPE_FUNCTION, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->custom = new_object_type(OBJECT_TYPE_CUSTOM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 }
 
 static int
@@ -254,6 +258,19 @@ int main(void)
     test_number_op(&builtin_types, '-', 1.0, 1.0, 0.0, stdout);
     test_number_op(&builtin_types, '*', 1.0, 1.0, 1.0, stdout);
     test_number_op(&builtin_types, '/', 1.0, 1.0, 1.0, stdout);
+
+    // Test String
+    struct Object string = {0};
+    struct Object string_slice = {0};
+    builtin_types.string.ctor(&string, &builtin_types.string, (union ObjectData){.string = mystrdup("Hello, World!")});
+    string.type->fprint(&string, stdout, true);
+    
+    builtin_types.string.slice(&string, 3, 10, &string_slice);
+    string_slice.type->fprint(&string_slice, stdout, true);
+
+    string.type->dtor(&string);
+    string_slice.type->dtor(&string_slice);
+
 
     return 0;
 }

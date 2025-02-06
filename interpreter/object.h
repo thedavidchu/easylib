@@ -63,6 +63,7 @@ struct ObjectType {
     int (*cap)(struct Object const *const, size_t *const result);
     int (*insert)(struct Object *const, size_t const idx, struct Object *const);
     int (*get)(struct Object *const, size_t const idx, struct Object **const);
+    int (*slice)(struct Object const *const, size_t const start, size_t const end, struct Object *const);
     int (*remove)(struct Object *const, size_t const idx, struct Object **const);
     // Number
     int (*add)(struct Object const *const, struct Object const *const, struct Object *const);
@@ -111,6 +112,7 @@ new_object_type(
     int (*cap)(struct Object const *const, size_t *const result),
     int (*insert)(struct Object *const, size_t const idx, struct Object *const),
     int (*get)(struct Object *const, size_t const idx, struct Object **const),
+    int (*slice)(struct Object const *const, size_t const start, size_t const end, struct Object *const),
     int (*remove)(struct Object *const, size_t const idx, struct Object **const),
     // Number
     int (*add)(struct Object const *const, struct Object const *const, struct Object *const),
@@ -136,6 +138,7 @@ int phony_len(struct Object const *const, size_t *const result);
 int phony_cap(struct Object const *const, size_t *const result);
 int phony_insert(struct Object *const, size_t const idx, struct Object *const);
 int phony_get(struct Object *const, size_t const idx, struct Object **const);
+int phony_slice(struct Object const *const, size_t const start, size_t const end, struct Object *const);
 int phony_remove(struct Object *const, size_t const idx, struct Object **const);
 // Number
 int phony_add(struct Object const *const, struct Object const *const, struct Object *const);
