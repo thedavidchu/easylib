@@ -20,10 +20,6 @@ test_array: build
 test_table: build
 	$(CC) $(CFLAGS) test_table.c table.c -o build/test_table
 
-.PHONY: object
-test_table: build
-	$(CC) $(CFLAGS) object.c -o build/object
-
 .PHONY: clean
 clean:
 	rm -rf build
