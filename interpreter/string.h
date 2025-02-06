@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+#include "object.h"
+
 /// @brief My implementation of 'strdup', which is not guaranteed to exist.
 char *
 cstr_dup(char const *const src)
@@ -22,6 +24,20 @@ cstr_dup(char const *const src)
     size_t const len = strlen(src);
     char *dst = malloc(len + 1);
     return strcpy(dst, src);
+}
+
+char *
+cstr_concat(char const *const first, char const *const second)
+{
+    if (first == NULL && second == NULL) { return NULL; }
+    if (first == NULL) { return cstr_dup(second); }
+    if (second == NULL) { return cstr_dup(first); }
+
+    size_t const first_len = strlen(first);
+    size_t const second_len = strlen(second);
+    char *dst = malloc(first_len + second_len + 1);
+    strcpy(dst, first);
+    return strcat(dst, second);
 }
 
 char *
