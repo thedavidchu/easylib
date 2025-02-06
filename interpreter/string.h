@@ -16,7 +16,7 @@
 
 /// @brief My implementation of 'strdup', which is not guaranteed to exist.
 char *
-mystrdup(char const *const src)
+cstr_dup(char const *const src)
 {
     if (src == NULL) { return NULL; }
     size_t const len = strlen(src);

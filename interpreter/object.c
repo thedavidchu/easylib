@@ -262,7 +262,7 @@ int main(void)
     // Test String
     struct Object string = {0};
     struct Object string_slice = {0};
-    builtin_types.string.ctor(&string, &builtin_types.string, (union ObjectData){.string = mystrdup("Hello, World!")});
+    builtin_types.string.ctor(&string, &builtin_types.string, (union ObjectData){.string = cstr_dup("Hello, World!")});
     string.type->fprint(&string, stdout, true);
     
     builtin_types.string.slice(&string, 3, 10, &string_slice);
