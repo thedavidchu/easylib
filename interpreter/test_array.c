@@ -43,7 +43,7 @@ test_legal_mod(char const *const test_name,
         err = array_insert(&a, idx, (void *)i);
         assert(!err);
         printf("> \t\tInserted %zu at %zu: ", i, idx);
-        err = array_write(&a, stdout, true);
+        err = array_fprint(&a, stdout, true);
         assert(!err);
     }
 
@@ -53,7 +53,7 @@ test_legal_mod(char const *const test_name,
         err = array_remove(&a, idx, (void **)&victim);
         assert(!err);
         printf("> \t\tRemoved %zu from %zu: ", victim, idx);
-        err = array_write(&a, stdout, true);
+        err = array_fprint(&a, stdout, true);
         assert(!err);
     }
 
@@ -80,21 +80,21 @@ test_illegal_mod(void)
         err = array_insert(&a, a.length, (void *)i);
         assert(!err);
     }
-    err = array_write(&a, stdout, true);
+    err = array_fprint(&a, stdout, true);
     assert(!err);
 
     printf("> \tFail inserting ILLEGAL position %zu + 1: ", a.length);
     err = array_insert(&a, a.length + 1, (void *)11);
     assert(err == -1);
     assert(a.length == 10 && "unexpected change in length");
-    err = array_write(&a, stdout, true);
+    err = array_fprint(&a, stdout, true);
     assert(!err);
 
     printf("> \tFail removing ILLEGAL position %zu: ", a.length);
     err = array_remove(&a, a.length, (void *)&victim);
     assert(err == -1);
     assert(a.length == 10 && "unexpected change in length");
-    err = array_write(&a, stdout, true);
+    err = array_fprint(&a, stdout, true);
     assert(!err);
 
     printf("> \tRemove 0..10: ");
@@ -103,7 +103,7 @@ test_illegal_mod(void)
         err = array_remove(&a, 0, (void **)&victim);
         assert(!err);
     }
-    err = array_write(&a, stdout, true);
+    err = array_fprint(&a, stdout, true);
     assert(!err);
 
     err = array_dtor(&a);
@@ -129,7 +129,7 @@ test_access(void)
         err = array_insert(&a, a.length, (void *)i);
         assert(!err);
     }
-    err = array_write(&a, stdout, true);
+    err = array_fprint(&a, stdout, true);
     assert(!err);
 
     printf("> \tAccess LEGAL positions 0..10\n");

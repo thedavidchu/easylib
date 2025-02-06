@@ -19,7 +19,7 @@ int
 array_dtor(struct Array *const me);
 
 int
-array_write(struct Array const *const me, FILE *const stream, bool newline);
+array_fprint(struct Array const *const me, FILE *const fp, bool newline);
 
 /// @brief  Insert an item into the array and give ownership to the array.
 int

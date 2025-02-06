@@ -108,14 +108,14 @@ array_dtor(struct Array *const me)
 }
 
 int
-array_write(struct Array const *const me, FILE *const stream, bool newline)
+array_fprint(struct Array const *const me, FILE *const fp, bool newline)
 {
     size_t i = 0;
-    fprintf(stream, "(len: %zu, cap: %zu) [", me->length, me->capacity);
+    fprintf(fp, "(len: %zu, cap: %zu) [", me->length, me->capacity);
     for (i = 0; i < me->length; ++i) {
-        fprintf(stream, "%p%s", me->array[i], i + 1 < me->length ? ", " : "");
+        fprintf(fp, "%p%s", me->array[i], i + 1 < me->length ? ", " : "");
     }
-    fprintf(stream, "]%s", newline ? "\n" : "");
+    fprintf(fp, "]%s", newline ? "\n" : "");
     return 0;
 }
 
