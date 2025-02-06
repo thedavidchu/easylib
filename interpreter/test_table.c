@@ -14,13 +14,13 @@ main(void)
     assert(!err);
     
     printf("> \tEmpty table: ");
-    table_write(&t, stdout, true);
+    table_fprint(&t, stdout, true);
     printf("> \tInsert keys 0..10\n");
     for (size_t i = 0; i < 10; ++i) {
         err = table_insert(&t, i, i);
         assert(!err);
         printf("> \t\tInserted %zu: %zu: ", i, i);
-        err = table_write(&t, stdout, true);
+        err = table_fprint(&t, stdout, true);
         assert(!err);
     }
 
@@ -45,7 +45,7 @@ main(void)
         assert(!err);
         assert(victim == i);
         printf("> \t\tRemoved %zu: %zu: ", i, victim);
-        err = table_write(&t, stdout, true);
+        err = table_fprint(&t, stdout, true);
         assert(!err);
     }
 

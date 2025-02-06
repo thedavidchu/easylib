@@ -32,7 +32,7 @@ table_dtor(struct Table *const me);
 
 /// @brief  Write the table in the order of the hashes.
 int
-table_write(struct Table const *const me, FILE *const stream, bool const newline);
+table_fprint(struct Table const *const me, FILE *const fp, bool const newline);
 
 /// @brief  Insert or update the value associated with a key.
 int

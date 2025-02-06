@@ -128,18 +128,18 @@ table_dtor(struct Table *const me)
 }
 
 int
-table_write(struct Table const *const me, FILE *const stream, bool const newline)
+table_fprint(struct Table const *const me, FILE *const fp, bool const newline)
 {
     size_t cnt = 0;
     if (me == NULL || me->data == NULL) { return -1; }
-    fprintf(stream, "(len: %zu, cap: %zu) {", me->length, me->capacity);
+    fprintf(fp, "(len: %zu, cap: %zu) {", me->length, me->capacity);
     for (size_t i = 0; i < me->capacity; ++i) {
         if (me->data[i].status == TABLE_NODE_VALID) {
             ++cnt;
-            fprintf(stream, "%zu: %zu%s", me->data[i].key, me->data[i].value, cnt < me->length ? ", " : "");
+            fprintf(fp, "%zu: %zu%s", me->data[i].key, me->data[i].value, cnt < me->length ? ", " : "");
         }
     }
-    fprintf(stream, "}%s", newline ? "\n" : "");
+    fprintf(fp, "}%s", newline ? "\n" : "");
     return 0;
 }
 
