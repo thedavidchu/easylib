@@ -58,7 +58,7 @@ struct ObjectType {
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result);
     /// @brief Print an object
     int (*fprint)(struct Object const *const, FILE *const fp, bool const newline);
-    int (*from_cstr)(struct Object const *const me, struct ObjectType const *const type, char const *const text);
+    int (*from_cstr)(struct Object const *const me, struct ObjectType const *const type, char const *const text, char const **end_cstr);
     // String, array, or table
     int (*len)(struct Object const *const, size_t *const result);
     int (*cap)(struct Object const *const, size_t *const result);
@@ -108,7 +108,7 @@ new_object_type(
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result),
     int (*fprint)(struct Object const *const, FILE *const fp, bool const newline),
-    int (*from_cstr)(struct Object const *const me, struct ObjectType const *const type, char const *const text),
+    int (*from_cstr)(struct Object const *const me, struct ObjectType const *const type, char const *const text, char const **end_cstr),
     // String, array, or table
     int (*len)(struct Object const *const, size_t *const result),
     int (*cap)(struct Object const *const, size_t *const result),
@@ -135,7 +135,7 @@ int phony_ctor(struct Object *const, struct ObjectType const *const type, union 
 int phony_dtor(struct Object *const);
 int phony_cmp(struct Object const *const, struct Object const *const, int *const result);
 int fprint(struct Object const *const me, FILE *const fp, bool const newline);
-int phony_from_cstr(struct Object const *const me, struct ObjectType const *const type, char const *const cstr);
+int phony_from_cstr(struct Object const *const me, struct ObjectType const *const type, char const *const cstr, char const **end_cstr);
 // String, array, or table
 int phony_len(struct Object const *const, size_t *const result);
 int phony_cap(struct Object const *const, size_t *const result);

@@ -17,7 +17,7 @@ int phony_ctor(struct Object *const me, struct ObjectType const *const type, uni
 int phony_dtor(struct Object *const me) { return -100; }
 int phony_cmp(struct Object const *const me, struct Object const *const other, int *const result) { return -100; }
 int phony_fprint(struct Object const *const me, FILE *const fp, bool const newline) { fprintf(fp, "<Object of type: 0x%p>%s", me->type, newline ? "\n" : ""); return -100; }
-int phony_from_cstr(struct Object const *const me, struct ObjectType const *const type, char const *const cstr) { (void)me; (void)type; (void)cstr; return -100; }
+int phony_from_cstr(struct Object const *const me, struct ObjectType const *const type, char const *const cstr, char const **end_cstr) { (void)me; (void)type; (void)cstr; return -100; }
 // String, array, or table
 int phony_len(struct Object const *const me, size_t *const result) { return -100; }
 int phony_cap(struct Object const *const me, size_t *const result) { return -100; }
@@ -47,7 +47,7 @@ new_object_type(
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result),
     int (*fprint)(struct Object const *const, FILE *const fp, bool const newline),
-    int (*from_cstr)(struct Object const *const, struct ObjectType const *const type, char const *const cstr),
+    int (*from_cstr)(struct Object const *const, struct ObjectType const *const type, char const *const cstr, char const **end_cstr),
     // String, array, or table
     int (*len)(struct Object const *const, size_t *const result),
     int (*cap)(struct Object const *const, size_t *const result),
