@@ -17,6 +17,7 @@ int phony_ctor(struct Object *const me, struct ObjectType const *const type, uni
 int phony_dtor(struct Object *const me) { return -100; }
 int phony_cmp(struct Object const *const me, struct Object const *const other, int *const result) { return -100; }
 int phony_fprint(struct Object const *const me, FILE *const fp, bool const newline) { fprintf(fp, "<Object of type: 0x%p>%s", me->type, newline ? "\n" : ""); return -100; }
+int phony_from_cstr(struct Object const *const me, struct ObjectType const *const type, char const *const cstr) { (void)me; (void)type; (void)cstr; return -100; }
 // String, array, or table
 int phony_len(struct Object const *const me, size_t *const result) { return -100; }
 int phony_cap(struct Object const *const me, size_t *const result) { return -100; }
@@ -46,6 +47,7 @@ new_object_type(
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result),
     int (*fprint)(struct Object const *const, FILE *const fp, bool const newline),
+    int (*from_cstr)(struct Object const *const, struct ObjectType const *const type, char const *const cstr),
     // String, array, or table
     int (*len)(struct Object const *const, size_t *const result),
     int (*cap)(struct Object const *const, size_t *const result),
@@ -73,6 +75,7 @@ new_object_type(
         .dtor = dtor ? dtor : phony_dtor,
         .cmp = cmp ? cmp : phony_cmp,
         .fprint = fprint ? fprint : phony_fprint,
+        .from_cstr = from_cstr ? from_cstr : phony_from_cstr,
         .len = len ? len : phony_len,
         .cap = cap ? cap : phony_cap,
         .insert = insert ? insert : phony_insert,
@@ -95,14 +98,14 @@ void
 init_builtin_object_types(struct BuiltinObjectTypes *const types)
 {
     // TODO
-    types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, nothing_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, boolean_not, boolean_and, boolean_or, boolean_truthiness, NULL);
-    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, number_fprint, NULL, NULL, NULL, NULL, NULL, NULL, number_add, number_sub, number_mul, number_div, NULL, NULL, NULL, NULL, NULL);
-    types->string = new_object_type(OBJECT_TYPE_STRING, string_ctor, string_dtor, string_cmp, string_fprint, string_len, NULL, NULL, NULL, string_slice, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->table = new_object_type(OBJECT_TYPE_TABLE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->function = new_object_type(OBJECT_TYPE_FUNCTION, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->custom = new_object_type(OBJECT_TYPE_CUSTOM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, nothing_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, boolean_not, boolean_and, boolean_or, boolean_truthiness, NULL);
+    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, number_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, number_add, number_sub, number_mul, number_div, NULL, NULL, NULL, NULL, NULL);
+    types->string = new_object_type(OBJECT_TYPE_STRING, string_ctor, string_dtor, string_cmp, string_fprint, NULL, string_len, NULL, NULL, NULL, string_slice, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->table = new_object_type(OBJECT_TYPE_TABLE, NULL,NULL,  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->function = new_object_type(OBJECT_TYPE_FUNCTION, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->custom = new_object_type(OBJECT_TYPE_CUSTOM, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 }
 
 static int
