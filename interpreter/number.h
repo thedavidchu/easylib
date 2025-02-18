@@ -1,7 +1,9 @@
 #pragma once
 
 #include <assert.h>
+#include <ctype.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include "object.h"
 
@@ -53,6 +55,29 @@ number_fprint(struct Object const *const me, FILE *const fp, bool const newline)
     if ((err = number_error(me))) { return err; }
     // TODO Handle errors in fprintf(...).
     fprintf(fp, "%f%s", me->data.number, newline ? "\n" : "");
+    return 0;
+}
+
+int
+number_from_cstr(struct Object *me, struct ObjectType const *const type, char const *const cstr, char const **cstr_end)
+{
+    if (me == NULL || type == NULL || cstr == NULL) { return -1; }
+    me->type = type;
+    if (isspace(*cstr)) {
+        *cstr_end = cstr;
+        return -1;
+    }
+    // NOTE For some reason, strtod doesn't mark the end pointer as
+    //      'char const **', but rather 'char **', implying it could
+    //      modify the string. No clue why... I hackily cast my problems
+    //      away!
+    double r = strtod(cstr, (char **)cstr_end);
+    if (r == 0.0 && cstr == *cstr_end) {
+        // Ideally, I want to return the errno, but I'm not sure if
+        // strtod sets the errno.
+        return -1;
+    }
+    me->data.number = r;
     return 0;
 }
 
