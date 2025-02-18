@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "object.h"
 
@@ -26,6 +27,24 @@ boolean_ctor(struct Object *me, struct ObjectType const *const type, union Objec
     me->type = type;
     // TODO Check if data is valid.
     me->data = data;
+    return 0;
+}
+
+int
+boolean_from_cstr(struct Object *me, struct ObjectType const *const type, char const *const cstr, char const **cstr_end)
+{
+    if (me == NULL || type == NULL || cstr == NULL) { return -1; }
+    me->type = type;
+    if (strncmp(cstr, "true", sizeof("true")) == 0) {
+        me->data.boolean = true;
+        *cstr_end = &cstr[sizeof("true")];
+    } else if (strncmp(cstr, "false", sizeof("false")) == 0) {
+        me->data.boolean = false;
+        *cstr_end = &cstr[sizeof("false")];
+    } else {
+        *cstr_end = cstr;
+        return -1;
+    }
     return 0;
 }
 
