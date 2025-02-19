@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "string.h"
+#include "cstr.h"
 
 int
 test_cstr_replace(char const *const str,

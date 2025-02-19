@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "cstr.h"
+#include "global.h"
 #include "object.h"
 
 static int
@@ -32,13 +33,14 @@ string_error(struct Object const *const me)
 
 int
 string_ctor(struct Object *const me,
-            struct ObjectType const *const type,
+            struct Global const *const global,
             union ObjectData const data)
 {
-    if (me == NULL || type == NULL || data.string == NULL) {
+    if (me == NULL || global == NULL || data.string == NULL) {
         return -1;
     }
-    me->type = type;
+    me->global = global;
+    me->type = &global->builtin_types.string;
     me->data = data;
     return 0;
 }
@@ -219,14 +221,15 @@ copy_parsed_cstr(char *const dst, char const *const src)
 
 int
 string_from_cstr(struct Object *const me,
-                 struct ObjectType const *const type,
+                 struct Global const *const global,
                  char const *const cstr,
                  char const **cstr_end)
 {
-    if (me == NULL || type == NULL || cstr == NULL || cstr_end == NULL) {
+    if (me == NULL || global == NULL || cstr == NULL || cstr_end == NULL) {
         return -1;
     }
-    me->type = type;
+    me->global = global;
+    me->type = &global->builtin_types.string;
     size_t length = 0;
     int err = count_parsed_cstr_length(cstr, &length, cstr_end);
     if (err) {
@@ -262,5 +265,5 @@ string_slice(struct Object const *const me,
     if (slice == NULL) {
         return -1;
     }
-    return string_ctor(result, me->type, (union ObjectData){.string = slice});
+    return string_ctor(result, me->global, (union ObjectData){.string = slice});
 }

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "global.h"
 #include "object.h"
 
 static inline char const *
@@ -25,13 +26,13 @@ boolean_error(struct Object const *const me)
 
 int
 boolean_ctor(struct Object *me,
-             struct ObjectType const *const type,
+             struct Global const *const global,
              union ObjectData data)
 {
-    if (me == NULL) {
+    if (me == NULL || global == NULL) {
         return -1;
     }
-    me->type = type;
+    me->type = &global->builtin_types.boolean;
     // TODO Check if data is valid.
     me->data = data;
     return 0;
@@ -39,14 +40,15 @@ boolean_ctor(struct Object *me,
 
 int
 boolean_from_cstr(struct Object *const me,
-                  struct ObjectType const *const type,
+                  struct Global const *const global,
                   char const *const cstr,
                   char const **cstr_end)
 {
-    if (me == NULL || type == NULL || cstr == NULL) {
+    if (me == NULL || global == NULL || cstr == NULL) {
         return -1;
     }
-    me->type = type;
+    me->global = global;
+    me->type = &global->builtin_types.boolean;
     if (strncmp(cstr, "true", sizeof("true")) == 0) {
         me->data.boolean = true;
         *cstr_end = &cstr[sizeof("true")];

@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "array.h"
+#include "global.h"
 
 static int
 nothing_error(struct Object const *const me)
@@ -25,13 +25,14 @@ nothing_error(struct Object const *const me)
 
 int
 nothing_ctor(struct Object *me,
-             struct ObjectType const *const type,
+             struct Global const *const global,
              union ObjectData data)
 {
-    if (me == NULL || type == NULL) {
+    if (me == NULL || global == NULL) {
         return -1;
     }
-    me->type = type;
+    me->global = global;
+    me->type = &global->builtin_types.nothing;
     // TODO Check if data is valid.
     me->data = data;
     return 0;

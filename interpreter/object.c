@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "boolean.h"
+#include "global.h"
 #include "nothing.h"
 #include "number.h"
 #include "object.h"
@@ -15,11 +16,11 @@
 // #YOLO! All objects
 int
 phony_ctor(struct Object *const me,
-           struct ObjectType const *const type,
+           struct Global const *const global,
            union ObjectData data)
 {
     (void)me;
-    (void)type;
+    (void)global;
     (void)data;
     return -100;
 }
@@ -43,12 +44,12 @@ phony_fprint(struct Object const *const me, FILE *const fp, bool const newline)
 }
 int
 phony_from_cstr(struct Object *const me,
-                struct ObjectType const *const type,
+                struct Global const *const global,
                 char const *const cstr,
                 char const **end_cstr)
 {
     (void)me;
-    (void)type;
+    (void)global;
     (void)cstr;
     return -100;
 }
@@ -161,7 +162,7 @@ struct ObjectType
 new_object_type(
     enum BuiltinObjectType type,
     int (*ctor)(struct Object *const,
-                struct ObjectType const *const type,
+                struct Global const *const type,
                 union ObjectData),
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const,
@@ -171,7 +172,7 @@ new_object_type(
                   FILE *const fp,
                   bool const newline),
     int (*from_cstr)(struct Object *const,
-                     struct ObjectType const *const type,
+                     struct Global const *const type,
                      char const *const cstr,
                      char const **end_cstr),
     // String, array, or table
@@ -413,7 +414,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
 }
 
 static int
-test_boolean_op(struct BuiltinObjectTypes const *const builtin_types,
+test_boolean_op(struct Global const *const global,
                 char const op,
                 double const lhs,
                 double const rhs,
@@ -422,12 +423,12 @@ test_boolean_op(struct BuiltinObjectTypes const *const builtin_types,
 {
     struct Object x = {0}, y = {0};
     bool r = false;
-    builtin_types->boolean.ctor(&x,
-                                &builtin_types->boolean,
-                                (union ObjectData){.boolean = lhs});
-    builtin_types->boolean.ctor(&y,
-                                &builtin_types->boolean,
-                                (union ObjectData){.boolean = rhs});
+    global->builtin_types.boolean.ctor(&x,
+                                       global,
+                                       (union ObjectData){.boolean = lhs});
+    global->builtin_types.boolean.ctor(&y,
+                                       global,
+                                       (union ObjectData){.boolean = rhs});
     switch (op) {
     case ' ':
         x.type->truthiness(&x, &r);
@@ -475,7 +476,7 @@ test_boolean_op(struct BuiltinObjectTypes const *const builtin_types,
 }
 
 static int
-test_number_op(struct BuiltinObjectTypes const *const builtin_types,
+test_number_op(struct Global const *const global,
                char const op,
                double const lhs,
                double const rhs,
@@ -483,12 +484,12 @@ test_number_op(struct BuiltinObjectTypes const *const builtin_types,
                FILE *const fp)
 {
     struct Object x = {0}, y = {0}, r = {0};
-    builtin_types->number.ctor(&x,
-                               &builtin_types->number,
-                               (union ObjectData){.number = lhs});
-    builtin_types->number.ctor(&y,
-                               &builtin_types->number,
-                               (union ObjectData){.number = rhs});
+    global->builtin_types.number.ctor(&x,
+                                      global,
+                                      (union ObjectData){.number = lhs});
+    global->builtin_types.number.ctor(&y,
+                                      global,
+                                      (union ObjectData){.number = rhs});
     switch (op) {
     case '+':
         x.type->add(&x, &y, &r);
@@ -523,17 +524,15 @@ test_number_op(struct BuiltinObjectTypes const *const builtin_types,
 }
 
 static int
-test_string_from_cstr(struct BuiltinObjectTypes const *const builtin_types,
+test_string_from_cstr(struct Global const *const global,
                       char const *const cstr,
                       int const expected_err,
                       char const *const expected)
 {
     struct Object string = {0};
     char const *endptr = NULL;
-    int err = builtin_types->string.from_cstr(&string,
-                                              &builtin_types->string,
-                                              cstr,
-                                              &endptr);
+    int err =
+        global->builtin_types.string.from_cstr(&string, global, cstr, &endptr);
     if (err != expected_err) {
         printf("Expected %d, got %d\n", expected_err, err);
         return -1;
@@ -553,22 +552,22 @@ int
 main(void)
 {
     // TODO Make global state object.
-    struct BuiltinObjectTypes builtin_types = {0};
-    init_builtin_object_types(&builtin_types);
+    struct Global global = {0};
+    init_global(&global);
 
     // Test Nothing
     struct Object nothing = {0};
-    builtin_types.nothing.ctor(&nothing,
-                               &builtin_types.nothing,
-                               (union ObjectData){.nothing = NULL});
+    global.builtin_types.nothing.ctor(&nothing,
+                                      &global,
+                                      (union ObjectData){.nothing = NULL});
     nothing.type->fprint(&nothing, stdout, true);
     nothing.type->dtor(&nothing);
 
     // Test Boolean
     struct Object boolean = {0};
-    builtin_types.boolean.ctor(&boolean,
-                               &builtin_types.boolean,
-                               (union ObjectData){.boolean = false});
+    global.builtin_types.boolean.ctor(&boolean,
+                                      &global,
+                                      (union ObjectData){.boolean = false});
     boolean.type->fprint(&boolean, stdout, true);
     boolean.data.boolean = true;
     boolean.type->fprint(&boolean, stdout, true);
@@ -576,42 +575,36 @@ main(void)
 
     int err = 0;
     char const *endptr = NULL;
-    builtin_types.boolean.from_cstr(&boolean,
-                                    &builtin_types.boolean,
-                                    "true",
-                                    &endptr);
+    global.builtin_types.boolean.from_cstr(&boolean, &global, "true", &endptr);
     boolean.type->fprint(&boolean, stdout, true);
     boolean.type->dtor(&boolean);
-    builtin_types.boolean.from_cstr(&boolean,
-                                    &builtin_types.boolean,
-                                    "false",
-                                    &endptr);
+    global.builtin_types.boolean.from_cstr(&boolean, &global, "false", &endptr);
     boolean.type->fprint(&boolean, stdout, true);
     boolean.type->dtor(&boolean);
-    err = builtin_types.boolean.from_cstr(&boolean,
-                                          &builtin_types.boolean,
-                                          "blah",
-                                          &endptr);
+    err = global.builtin_types.boolean.from_cstr(&boolean,
+                                                 &global,
+                                                 "blah",
+                                                 &endptr);
     assert(err);
 
-    test_boolean_op(&builtin_types, ' ', true, 0, true, stdout);
-    test_boolean_op(&builtin_types, ' ', false, 0, false, stdout);
-    test_boolean_op(&builtin_types, '!', true, 0, false, stdout);
-    test_boolean_op(&builtin_types, '!', false, 0, true, stdout);
-    test_boolean_op(&builtin_types, '&', true, true, true, stdout);
-    test_boolean_op(&builtin_types, '&', true, false, false, stdout);
-    test_boolean_op(&builtin_types, '&', false, true, false, stdout);
-    test_boolean_op(&builtin_types, '&', false, false, false, stdout);
-    test_boolean_op(&builtin_types, '|', true, true, true, stdout);
-    test_boolean_op(&builtin_types, '|', true, false, true, stdout);
-    test_boolean_op(&builtin_types, '|', false, true, true, stdout);
-    test_boolean_op(&builtin_types, '|', false, false, false, stdout);
+    test_boolean_op(&global, ' ', true, 0, true, stdout);
+    test_boolean_op(&global, ' ', false, 0, false, stdout);
+    test_boolean_op(&global, '!', true, 0, false, stdout);
+    test_boolean_op(&global, '!', false, 0, true, stdout);
+    test_boolean_op(&global, '&', true, true, true, stdout);
+    test_boolean_op(&global, '&', true, false, false, stdout);
+    test_boolean_op(&global, '&', false, true, false, stdout);
+    test_boolean_op(&global, '&', false, false, false, stdout);
+    test_boolean_op(&global, '|', true, true, true, stdout);
+    test_boolean_op(&global, '|', true, false, true, stdout);
+    test_boolean_op(&global, '|', false, true, true, stdout);
+    test_boolean_op(&global, '|', false, false, false, stdout);
 
     // Test Number
     struct Object number = {0};
-    builtin_types.boolean.ctor(&number,
-                               &builtin_types.number,
-                               (union ObjectData){.number = 0.0});
+    global.builtin_types.boolean.ctor(&number,
+                                      &global,
+                                      (union ObjectData){.number = 0.0});
     number.type->fprint(&number, stdout, true);
     number.data.number = 1.0;
     number.type->fprint(&number, stdout, true);
@@ -623,66 +616,51 @@ main(void)
     number.type->fprint(&number, stdout, true);
     number.type->dtor(&number);
 
-    builtin_types.number.from_cstr(&number,
-                                   &builtin_types.number,
-                                   "0.0",
-                                   &endptr);
+    global.builtin_types.number.from_cstr(&number, &global, "0.0", &endptr);
     number.type->fprint(&number, stdout, true);
     number.type->dtor(&number);
-    builtin_types.number.from_cstr(&number,
-                                   &builtin_types.number,
-                                   "1.23e45",
-                                   &endptr);
+    global.builtin_types.number.from_cstr(&number, &global, "1.23e45", &endptr);
     number.type->fprint(&number, stdout, true);
     number.type->dtor(&number);
-    builtin_types.number.from_cstr(&number,
-                                   &builtin_types.number,
-                                   "-12.34E-56",
-                                   &endptr);
+    global.builtin_types.number.from_cstr(&number,
+                                          &global,
+                                          "-12.34E-56",
+                                          &endptr);
     number.type->fprint(&number, stdout, true);
     number.type->dtor(&number);
-    builtin_types.number.from_cstr(&number,
-                                   &builtin_types.number,
-                                   "10000.0",
-                                   &endptr);
+    global.builtin_types.number.from_cstr(&number, &global, "10000.0", &endptr);
     number.type->fprint(&number, stdout, true);
     number.type->dtor(&number);
-    err = builtin_types.number.from_cstr(&number,
-                                         &builtin_types.number,
-                                         "blah",
-                                         &endptr);
+    err = global.builtin_types.number.from_cstr(&number,
+                                                &global,
+                                                "blah",
+                                                &endptr);
     assert(err);
 
-    test_number_op(&builtin_types, '+', 1.0, 1.0, 2.0, stdout);
-    test_number_op(&builtin_types, '-', 1.0, 1.0, 0.0, stdout);
-    test_number_op(&builtin_types, '*', 1.0, 1.0, 1.0, stdout);
-    test_number_op(&builtin_types, '/', 1.0, 1.0, 1.0, stdout);
+    test_number_op(&global, '+', 1.0, 1.0, 2.0, stdout);
+    test_number_op(&global, '-', 1.0, 1.0, 0.0, stdout);
+    test_number_op(&global, '*', 1.0, 1.0, 1.0, stdout);
+    test_number_op(&global, '/', 1.0, 1.0, 1.0, stdout);
 
     // Test String
     struct Object string = {0};
     struct Object string_slice = {0};
-    builtin_types.string.ctor(
+    global.builtin_types.string.ctor(
         &string,
-        &builtin_types.string,
+        &global,
         (union ObjectData){.string = cstr_dup("Hello, World!")});
     string.type->fprint(&string, stdout, true);
 
-    builtin_types.string.slice(&string, 3, 10, &string_slice);
+    global.builtin_types.string.slice(&string, 3, 10, &string_slice);
     string_slice.type->fprint(&string_slice, stdout, true);
 
     string.type->dtor(&string);
     string_slice.type->dtor(&string_slice);
 
-    test_string_from_cstr(&builtin_types,
-                          "\"Hello, World!\"",
-                          0,
-                          "Hello, World!");
-    test_string_from_cstr(&builtin_types,
-                          "\" \\a \\b \\\\ \"",
-                          0,
-                          " \a \b \\ ");
-    test_string_from_cstr(&builtin_types, " \\ ", -1, NULL);
-    test_string_from_cstr(&builtin_types, "\" \\ ", -1, NULL);
+    test_string_from_cstr(&global, "\"Hello, World!\"", 0, "Hello, World!");
+    test_string_from_cstr(&global, "\" \\a \\b \\\\ \"", 0, " \a \b \\ ");
+    test_string_from_cstr(&global, " \\ ", -1, NULL);
+    test_string_from_cstr(&global, "\" \\ ", -1, NULL);
 
     return 0;
 }

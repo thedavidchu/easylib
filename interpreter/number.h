@@ -2,15 +2,15 @@
 
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>
 #include <stdlib.h>
 
+#include "global.h"
 #include "object.h"
 
 static int
 number_error(struct Object const *const me)
 {
-    if (me == NULL || me->type == NULL ||
+    if (me == NULL || me->global == NULL || me->type == NULL ||
         me->type->type != OBJECT_TYPE_NUMBER) {
         return -1;
     }
@@ -19,13 +19,14 @@ number_error(struct Object const *const me)
 
 int
 number_ctor(struct Object *me,
-            struct ObjectType const *const type,
+            struct Global const *const global,
             union ObjectData data)
 {
-    if (me == NULL) {
+    if (me == NULL || global == NULL) {
         return -1;
     }
-    me->type = type;
+    me->global = global;
+    me->type = &global->builtin_types.number;
     // TODO Check if data is valid.
     me->data = data;
     return 0;
@@ -92,14 +93,15 @@ number_fprint(struct Object const *const me, FILE *const fp, bool const newline)
 
 int
 number_from_cstr(struct Object *const me,
-                 struct ObjectType const *const type,
+                 struct Global const *const global,
                  char const *const cstr,
                  char const **cstr_end)
 {
-    if (me == NULL || type == NULL || cstr == NULL) {
+    if (me == NULL || global == NULL || cstr == NULL) {
         return -1;
     }
-    me->type = type;
+    me->global = global;
+    me->type = &global->builtin_types.number;
     if (isspace(*cstr)) {
         *cstr_end = cstr;
         return -1;
@@ -148,8 +150,9 @@ generic_number_op(struct Object const *const lhs,
     default:
         return -1;
     }
-    if ((err =
-             number_ctor(result, lhs->type, (union ObjectData){.number = ans})))
+    if ((err = number_ctor(result,
+                           lhs->global,
+                           (union ObjectData){.number = ans})))
         ;
     return 0;
 }

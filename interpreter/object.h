@@ -15,6 +15,7 @@
 #include <stdio.h>
 
 struct Object;
+struct Global;
 union ObjectData {
     void *nothing;
     bool boolean;
@@ -45,7 +46,7 @@ struct ObjectType {
     enum BuiltinObjectType type;
     /// @brief Construct an object.
     int (*ctor)(struct Object *const,
-                struct ObjectType const *const,
+                struct Global const *const,
                 union ObjectData);
     /// @brief Destroy an object.
     int (*dtor)(struct Object *const);
@@ -65,7 +66,7 @@ struct ObjectType {
                   FILE *const fp,
                   bool const newline);
     int (*from_cstr)(struct Object *const me,
-                     struct ObjectType const *const type,
+                     struct Global const *const type,
                      char const *const text,
                      char const **end_cstr);
     // String, array, or table
@@ -123,6 +124,7 @@ struct BuiltinObjectTypes {
 };
 
 struct Object {
+    struct Global const *global;
     struct ObjectType const *type;
     union ObjectData data;
 };
@@ -133,7 +135,7 @@ struct ObjectType
 new_object_type(
     enum BuiltinObjectType type,
     int (*ctor)(struct Object *const,
-                struct ObjectType const *const,
+                struct Global const *const,
                 union ObjectData),
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const,
@@ -143,7 +145,7 @@ new_object_type(
                   FILE *const fp,
                   bool const newline),
     int (*from_cstr)(struct Object *const me,
-                     struct ObjectType const *const type,
+                     struct Global const *const type,
                      char const *const text,
                      char const **end_cstr),
     // String, array, or table
@@ -188,7 +190,7 @@ new_object_type(
 // All objects
 int
 phony_ctor(struct Object *const,
-           struct ObjectType const *const type,
+           struct Global const *const global,
            union ObjectData);
 int
 phony_dtor(struct Object *const);
@@ -200,7 +202,7 @@ int
 fprint(struct Object const *const me, FILE *const fp, bool const newline);
 int
 phony_from_cstr(struct Object *const me,
-                struct ObjectType const *const type,
+                struct Global const *const global,
                 char const *const cstr,
                 char const **end_cstr);
 // String, array, or table
