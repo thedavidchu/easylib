@@ -248,7 +248,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
                                      nothing_dtor,
                                      nothing_cmp,
                                      nothing_fprint,
-                                     NULL,
+                                     nothing_from_cstr,
                                      NULL,
                                      NULL,
                                      NULL,
@@ -551,7 +551,9 @@ test_string_from_cstr(struct Global const *const global,
 int
 main(void)
 {
-    // TODO Make global state object.
+    int err = 0;
+    char const *endptr = NULL;
+
     struct Global global = {0};
     init_global(&global);
 
@@ -563,6 +565,16 @@ main(void)
     nothing.type->fprint(&nothing, stdout, true);
     nothing.type->dtor(&nothing);
 
+    global.builtin_types.nothing.from_cstr(&nothing, &global, "null", &endptr);
+    nothing.type->fprint(&nothing, stdout, true);
+    nothing.type->dtor(&nothing);
+
+    err = global.builtin_types.nothing.from_cstr(&nothing,
+                                                 &global,
+                                                 "blah",
+                                                 &endptr);
+    assert(err);
+
     // Test Boolean
     struct Object boolean = {0};
     global.builtin_types.boolean.ctor(&boolean,
@@ -573,8 +585,6 @@ main(void)
     boolean.type->fprint(&boolean, stdout, true);
     boolean.type->dtor(&boolean);
 
-    int err = 0;
-    char const *endptr = NULL;
     global.builtin_types.boolean.from_cstr(&boolean, &global, "true", &endptr);
     boolean.type->fprint(&boolean, stdout, true);
     boolean.type->dtor(&boolean);

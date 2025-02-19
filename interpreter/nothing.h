@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "global.h"
 
@@ -84,5 +85,26 @@ nothing_fprint(struct Object const *const me,
         return err;
     }
     fprintf(fp, "Nothing%s", newline ? "\n" : "");
+    return 0;
+}
+
+int
+nothing_from_cstr(struct Object *const me,
+                  struct Global const *const global,
+                  char const *const cstr,
+                  char const **cstr_end)
+{
+    if (me == NULL || global == NULL || cstr == NULL || cstr_end == NULL) {
+        return -1;
+    }
+    me->global = global;
+    me->type = &global->builtin_types.nothing;
+    if (strncmp(cstr, "null", sizeof("null")) == 0) {
+        me->data.nothing = NULL;
+        *cstr_end = &cstr[sizeof("null")];
+    } else {
+        *cstr_end = cstr;
+        return -1;
+    }
     return 0;
 }
