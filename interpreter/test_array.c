@@ -23,11 +23,10 @@ append(struct Array *me)
     return me->length;
 }
 
-
 int
 test_legal_mod(char const *const test_name,
-            size_t (*ins)(struct Array *me),
-            size_t (*del)(struct Array *me))
+               size_t (*ins)(struct Array *me),
+               size_t (*del)(struct Array *me))
 {
     int err = 0;
     size_t i = 0, idx = 0, victim = 0;

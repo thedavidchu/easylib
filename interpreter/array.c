@@ -1,16 +1,18 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "array.h"
 
-#define FILTER(func_call) \
-    do { \
-        int err = (func_call); \
-        if (err) { return err; } \
+#define FILTER(func_call)                                                      \
+    do {                                                                       \
+        int err = (func_call);                                                 \
+        if (err) {                                                             \
+            return err;                                                        \
+        }                                                                      \
     } while (0)
 
 static size_t const DEFAULT_ARRAY_CAPACITY = 8;
@@ -19,24 +21,35 @@ static double const DEFAULT_GROWTH_FACTOR = 2;
 static bool
 ok(struct Array const *const me)
 {
-    if (me == NULL) { return false; }
-    if (me->array == NULL) { return me->capacity == 0; }
-    if (me->capacity < me->length) { return false; }
+    if (me == NULL) {
+        return false;
+    }
+    if (me->array == NULL) {
+        return me->capacity == 0;
+    }
+    if (me->capacity < me->length) {
+        return false;
+    }
     return true;
 }
-
 
 static int
 resize(struct Array *const me, size_t const new_capacity)
 {
-    if (me == NULL) { return -1; }
+    if (me == NULL) {
+        return -1;
+    }
     // Assert data is not corrupted.
     assert(ok(me));
     // We do not allow the user to destroy data through resizing.
-    if (me->length > new_capacity) { return -1; }
+    if (me->length > new_capacity) {
+        return -1;
+    }
     // TODO Ensure no overflow in multiplication.
     void **new_array = realloc(me->array, sizeof(*me->array) * new_capacity);
-    if (new_capacity != 0 && new_array == NULL) { return -1; }
+    if (new_capacity != 0 && new_array == NULL) {
+        return -1;
+    }
     me->array = new_array;
     me->capacity = new_capacity;
     return 0;
@@ -45,7 +58,9 @@ resize(struct Array *const me, size_t const new_capacity)
 static int
 grow(struct Array *const me)
 {
-    if (me == NULL) { return -1; }
+    if (me == NULL) {
+        return -1;
+    }
     if (me->capacity == 0) {
         return resize(me, DEFAULT_ARRAY_CAPACITY);
     }
@@ -86,11 +101,12 @@ shift_left(struct Array *const me, size_t const victim_idx)
     return 0;
 }
 
-
 int
 array_ctor(struct Array *const me)
 {
-    if (me == NULL) { return -1; }
+    if (me == NULL) {
+        return -1;
+    }
     *me = (struct Array){0};
     assert(ok(me));
     return grow(me);
@@ -99,7 +115,9 @@ array_ctor(struct Array *const me)
 int
 array_dtor(struct Array *const me)
 {
-    if (me == NULL) { return -1; }
+    if (me == NULL) {
+        return -1;
+    }
     assert(ok(me));
     // TODO Destroy elements in this array recursively.
     free(me->array);
@@ -122,10 +140,14 @@ array_fprint(struct Array const *const me, FILE *const fp, bool newline)
 int
 array_insert(struct Array *const me, size_t const idx, void *const item)
 {
-    if (me == NULL || me->array == NULL) { return -1; }
+    if (me == NULL || me->array == NULL) {
+        return -1;
+    }
     assert(ok(me));
     // Check for out of bounds access.
-    if (idx > me->length) { return -1; }
+    if (idx > me->length) {
+        return -1;
+    }
     if (me->length + 1 > me->capacity) {
         FILTER(grow(me));
     }
@@ -133,17 +155,23 @@ array_insert(struct Array *const me, size_t const idx, void *const item)
     me->array[idx] = item;
     ++me->length;
     return 0;
-} 
+}
 
 int
 array_get(struct Array *const me, size_t const idx, void **const result)
 {
-    if (me == NULL || me->array == NULL) { return -1; }
+    if (me == NULL || me->array == NULL) {
+        return -1;
+    }
     assert(ok(me));
     // Check for out of bounds access.
-    if (idx >= me->length) { return -1; }
+    if (idx >= me->length) {
+        return -1;
+    }
     // Return the result.
-    if (result == NULL) { return -1; }
+    if (result == NULL) {
+        return -1;
+    }
     *result = me->array[idx];
     return 0;
 }
@@ -151,16 +179,21 @@ array_get(struct Array *const me, size_t const idx, void **const result)
 int
 array_remove(struct Array *const me, size_t const idx, void **const victim)
 {
-    if (me == NULL || me->array == NULL) { return -1; }
+    if (me == NULL || me->array == NULL) {
+        return -1;
+    }
     assert(ok(me));
     // Check for out of bounds access.
-    if (idx >= me->length) { return -1; }
+    if (idx >= me->length) {
+        return -1;
+    }
     // Return the victim for deletion.
-    if (victim == NULL) { return -1; }
+    if (victim == NULL) {
+        return -1;
+    }
     *victim = me->array[idx];
     // TODO Shrink if necessary.
     FILTER(shift_left(me, idx));
     --me->length;
     return 0;
-} 
-
+}

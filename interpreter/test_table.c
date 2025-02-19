@@ -12,7 +12,7 @@ main(void)
     printf("> Test Table\n");
     err = table_ctor(&t);
     assert(!err);
-    
+
     printf("> \tEmpty table: ");
     table_fprint(&t, stdout, true);
     printf("> \tInsert keys 0..10\n");

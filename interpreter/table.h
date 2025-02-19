@@ -44,4 +44,3 @@ table_get(struct Table *const me, size_t const key, size_t *const value);
 
 int
 table_remove(struct Table *const me, size_t const key, size_t *const value);
-

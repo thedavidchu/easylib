@@ -33,4 +33,3 @@ array_get(struct Array *const me, size_t const idx, void **const result);
 /// @note   The caller is responsible for freeing the resources of the victim.
 int
 array_remove(struct Array *const me, size_t const idx, void **const victim);
-
