@@ -1,3 +1,5 @@
+#pragma once
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -6,7 +8,7 @@
 #include <string.h>
 
 /// @brief  Returns true if both inputs are valid strings and equal.
-bool
+static inline bool
 cstr_valid_equal(char const *const lhs, char const *const rhs)
 {
     if (lhs == NULL || rhs == NULL) {
@@ -16,7 +18,7 @@ cstr_valid_equal(char const *const lhs, char const *const rhs)
 }
 
 /// @brief My implementation of 'strdup', which is not guaranteed to exist.
-char *
+static inline char *
 cstr_dup(char const *const src)
 {
     if (src == NULL) {
@@ -30,7 +32,7 @@ cstr_dup(char const *const src)
 /// @brief  Assemble a string by prepending, joining, and appending.
 /// @note   This function does not accept NULL values; if you want that,
 ///         you can write a wrapper function.
-char *
+static inline char *
 cstr_assemble(char const *const start,
               char const *const end,
               char const *const join,
@@ -71,7 +73,7 @@ cstr_assemble(char const *const start,
 ///         compile-time error.
 /// @note   I do not accept any NULL values (I don't treat these as
 ///         empty strings).
-char *
+static inline char *
 cstr_join(char const *const join,
           size_t const length,
           char const *const *const str_array)
@@ -79,14 +81,14 @@ cstr_join(char const *const join,
     return cstr_assemble("", "", join, length, str_array);
 }
 
-char *
+static inline char *
 cstr_concat(char const *const first, char const *const second)
 {
     char const *str_array[] = {NULL};
     return cstr_assemble(first, second, "", 0, str_array);
 }
 
-char *
+static inline char *
 cstr_slice(char const *const src, size_t const start, size_t const end)
 {
     if (src == NULL) {
@@ -109,7 +111,7 @@ cstr_slice(char const *const src, size_t const start, size_t const end)
 
 /// @brief  Get the starting index of a the first occurrence of a substring.
 /// @return Return the index or SIZE_MAX on error.
-size_t
+static inline size_t
 cstr_find(char const *const me, char const *const pattern)
 {
     if (me == NULL || pattern == NULL) {
@@ -141,7 +143,7 @@ cstr_find(char const *const me, char const *const pattern)
 
 /// @brief  Count the non-overlapping occurrences of a pattern.
 /// @note   I haven't thought through this algorithm fully.
-size_t
+static inline size_t
 cstr_count(char const *const me, char const *const pattern)
 {
     if (me == NULL || pattern == NULL) {
@@ -164,10 +166,8 @@ cstr_count(char const *const me, char const *const pattern)
     }
 }
 
-#include <stdio.h>
-
 /// @brief  Find and replace non-overlapping occurrences in a string.
-char *
+static inline char *
 cstr_replace(char const *const me,
              char const *const find,
              char const *const replace)

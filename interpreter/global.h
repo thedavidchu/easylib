@@ -7,7 +7,7 @@ struct Global {
     // TODO Hold the stack frames with variables.
 };
 
-int
+static inline int
 init_global(struct Global *const global)
 {
     int err = 0;
@@ -15,7 +15,7 @@ init_global(struct Global *const global)
     return err;
 }
 
-int
+static inline int
 destroy_global(struct Global *const global)
 {
     *global = (struct Global){0};
