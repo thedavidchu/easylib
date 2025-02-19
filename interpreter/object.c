@@ -210,6 +210,27 @@ test_number_op(struct BuiltinObjectTypes const *const builtin_types,
     return 0;
 }
 
+static int
+test_string_from_cstr(struct BuiltinObjectTypes const *const builtin_types, char const *const cstr, int const expected_err, char const *const expected)
+{
+    struct Object string = {0};
+    char const *endptr = NULL;
+    int err = builtin_types->string.from_cstr(&string, &builtin_types->string, cstr, &endptr);
+    if (err != expected_err) {
+        printf("Expected %d, got %d\n", expected_err, err);
+        return -1;
+    }
+    if (!err) {
+        string.type->fprint(&string, stdout, true);
+        if (strcmp(string.data.string, expected) != 0) {
+            printf("Expected '%s', got '%s'\n", expected, string.data.string);
+            return -1;
+        }
+        string.type->dtor(&string);
+    }
+    return 0;
+}
+
 int main(void)
 {
     // TODO Make global state object.
@@ -300,13 +321,10 @@ int main(void)
     string.type->dtor(&string);
     string_slice.type->dtor(&string_slice);
 
-    builtin_types.string.from_cstr(&string, &builtin_types.string, "\"Hello, World!\"", &endptr);
-    string.type->fprint(&string, stdout, true);
-    string.type->dtor(&string);
-
-    builtin_types.string.from_cstr(&string, &builtin_types.string, "\" \\a \\b \\\\ \"", &endptr);
-    string.type->fprint(&string, stdout, true);
-    string.type->dtor(&string);
+    test_string_from_cstr(&builtin_types,  "\"Hello, World!\"", 0, "Hello, World!");
+    test_string_from_cstr(&builtin_types,   "\" \\a \\b \\\\ \"", 0, " \a \b \\ ");
+    test_string_from_cstr(&builtin_types,   " \\ ", -1, NULL);
+    test_string_from_cstr(&builtin_types,   "\" \\ ", -1, NULL);
 
     return 0;
 }

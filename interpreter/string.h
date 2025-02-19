@@ -183,25 +183,25 @@ copy_parsed_cstr(char *const dst, char const *const src)
                 *tmp_dst = '/';
                 break;
             case 'a':
-                *tmp_dst = 'a';
+                *tmp_dst = '\a';
                 break;
             case 'b':
-                *tmp_dst = 'b';
+                *tmp_dst = '\b';
                 break;
             case 'f':
-                *tmp_dst = 'f';
+                *tmp_dst = '\f';
                 break;
             case 'n':
-                *tmp_dst = 'n';
+                *tmp_dst = '\n';
                 break;
             case 'r':
-                *tmp_dst = 'r';
+                *tmp_dst = '\r';
                 break;
             case 't':
-                *tmp_dst = 't';
+                *tmp_dst = '\t';
                 break;
             case 'v':
-                *tmp_dst = 'v';
+                *tmp_dst = '\v';
                 break;
             default:
                 assert(0 && "bad escaped character");
