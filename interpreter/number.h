@@ -59,7 +59,7 @@ number_fprint(struct Object const *const me, FILE *const fp, bool const newline)
 }
 
 int
-number_from_cstr(struct Object *me, struct ObjectType const *const type, char const *const cstr, char const **cstr_end)
+number_from_cstr(struct Object *const me, struct ObjectType const *const type, char const *const cstr, char const **cstr_end)
 {
     if (me == NULL || type == NULL || cstr == NULL) { return -1; }
     me->type = type;

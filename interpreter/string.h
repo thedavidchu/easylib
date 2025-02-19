@@ -90,6 +90,153 @@ string_fprint(struct Object const *const me, FILE *const fp, bool const newline)
     return 0;
 }
 
+static int
+count_parsed_cstr_length(char const *const cstr,
+                         size_t *length,
+                         char const **cstr_end)
+{
+    if (cstr == NULL || cstr_end == NULL) {
+        return -1;
+    }
+    if (length == NULL || *cstr != '"') {
+        goto cleanup_error;
+    }
+    char const *tmp = cstr + 1;
+    size_t len = 0;
+
+    while (true) {
+        switch (*tmp) {
+        case '"':
+            // Finish up!
+            *length = len;
+            *cstr_end = tmp + 1;
+            return 0;
+        case '\\':
+            ++tmp;
+            switch (*tmp) {
+            case '"':
+                break;
+            case '\'':
+                break;
+            case '\\':
+                break;
+            case '/':
+                break;
+            case 'a':
+                break;
+            case 'b':
+                break;
+            case 'f':
+                break;
+            case 'n':
+                break;
+            case 'r':
+                break;
+            case 't':
+                break;
+            case 'v':
+                break;
+            default:
+                goto cleanup_error;
+            }
+            ++len;
+            ++tmp;
+            break;
+        case '\0':
+            goto cleanup_error;
+        default:
+            ++len;
+            ++tmp;
+            break;
+        }
+    }
+cleanup_error:
+    *cstr_end = cstr;
+    return -1;
+}
+
+static void
+copy_parsed_cstr(char *const dst, char const *const src)
+{
+    assert(dst != NULL && src != NULL);
+    assert(*src == '"');
+    char const *tmp_src = src + 1;
+    char *tmp_dst = dst;
+    while (true) {
+        switch (*tmp_src) {
+        case '"':
+            *tmp_dst = '\0';
+            return;
+        case '\\':
+            ++tmp_src;
+            switch (*tmp_src) {
+            case '"':
+                *tmp_dst = '"';
+                break;
+            case '\'':
+                *tmp_dst = '\'';
+                break;
+            case '\\':
+                *tmp_dst = '\\';
+                break;
+            case '/':
+                *tmp_dst = '/';
+                break;
+            case 'a':
+                *tmp_dst = 'a';
+                break;
+            case 'b':
+                *tmp_dst = 'b';
+                break;
+            case 'f':
+                *tmp_dst = 'f';
+                break;
+            case 'n':
+                *tmp_dst = 'n';
+                break;
+            case 'r':
+                *tmp_dst = 'r';
+                break;
+            case 't':
+                *tmp_dst = 't';
+                break;
+            case 'v':
+                *tmp_dst = 'v';
+                break;
+            default:
+                assert(0 && "bad escaped character");
+            }
+            ++tmp_dst;
+            ++tmp_src;
+        default:
+            assert(*tmp_src != '\0');
+            *tmp_dst = *tmp_src;
+            ++tmp_dst;
+            ++tmp_src;
+        }
+    }
+}
+
+int
+string_from_cstr(struct Object *const me,
+                 struct ObjectType const *const type,
+                 char const *const cstr,
+                 char const **cstr_end)
+{
+    if (me == NULL || type == NULL || cstr == NULL || cstr_end == NULL) {
+        return -1;
+    }
+    me->type = type;
+    size_t length = 0;
+    int err = count_parsed_cstr_length(cstr, &length, cstr_end);
+    if (err) {
+        return -1;
+    }
+    me->data.string = malloc(length + 1);
+    copy_parsed_cstr(me->data.string, cstr);
+    return 0;
+}
+
 int
 string_len(struct Object const *const me, size_t *const len)
 {

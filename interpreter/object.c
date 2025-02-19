@@ -17,7 +17,7 @@ int phony_ctor(struct Object *const me, struct ObjectType const *const type, uni
 int phony_dtor(struct Object *const me) { return -100; }
 int phony_cmp(struct Object const *const me, struct Object const *const other, int *const result) { return -100; }
 int phony_fprint(struct Object const *const me, FILE *const fp, bool const newline) { fprintf(fp, "<Object of type: 0x%p>%s", me->type, newline ? "\n" : ""); return -100; }
-int phony_from_cstr(struct Object const *const me, struct ObjectType const *const type, char const *const cstr, char const **end_cstr) { (void)me; (void)type; (void)cstr; return -100; }
+int phony_from_cstr(struct Object *const me, struct ObjectType const *const type, char const *const cstr, char const **end_cstr) { (void)me; (void)type; (void)cstr; return -100; }
 // String, array, or table
 int phony_len(struct Object const *const me, size_t *const result) { return -100; }
 int phony_cap(struct Object const *const me, size_t *const result) { return -100; }
@@ -47,7 +47,7 @@ new_object_type(
     int (*dtor)(struct Object *const),
     int (*cmp)(struct Object const *const, struct Object const *const, int *const result),
     int (*fprint)(struct Object const *const, FILE *const fp, bool const newline),
-    int (*from_cstr)(struct Object const *const, struct ObjectType const *const type, char const *const cstr, char const **end_cstr),
+    int (*from_cstr)(struct Object *const, struct ObjectType const *const type, char const *const cstr, char const **end_cstr),
     // String, array, or table
     int (*len)(struct Object const *const, size_t *const result),
     int (*cap)(struct Object const *const, size_t *const result),
@@ -99,9 +99,9 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
 {
     // TODO
     types->nothing = new_object_type(OBJECT_TYPE_NOTHING, nothing_ctor, nothing_dtor, nothing_cmp, nothing_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, boolean_not, boolean_and, boolean_or, boolean_truthiness, NULL);
-    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, number_fprint, NULL, NULL, NULL, NULL, NULL, NULL, NULL, number_add, number_sub, number_mul, number_div, NULL, NULL, NULL, NULL, NULL);
-    types->string = new_object_type(OBJECT_TYPE_STRING, string_ctor, string_dtor, string_cmp, string_fprint, NULL, string_len, NULL, NULL, NULL, string_slice, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    types->boolean = new_object_type(OBJECT_TYPE_BOOLEAN, boolean_ctor, boolean_dtor, boolean_cmp, boolean_fprint, boolean_from_cstr, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, boolean_not, boolean_and, boolean_or, boolean_truthiness, NULL);
+    types->number = new_object_type(OBJECT_TYPE_NUMBER, number_ctor, number_dtor, number_cmp, number_fprint, number_from_cstr, NULL, NULL, NULL, NULL, NULL, NULL, number_add, number_sub, number_mul, number_div, NULL, NULL, NULL, NULL, NULL);
+    types->string = new_object_type(OBJECT_TYPE_STRING, string_ctor, string_dtor, string_cmp, string_fprint, string_from_cstr, string_len, NULL, NULL, NULL, string_slice, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->array = new_object_type(OBJECT_TYPE_ARRAY, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->table = new_object_type(OBJECT_TYPE_TABLE, NULL,NULL,  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     types->function = new_object_type(OBJECT_TYPE_FUNCTION, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -230,6 +230,17 @@ int main(void)
     boolean.type->fprint(&boolean, stdout, true);
     boolean.type->dtor(&boolean);
 
+    int err = 0;
+    char const *endptr = NULL;
+    builtin_types.boolean.from_cstr(&boolean, &builtin_types.boolean, "true", &endptr);
+    boolean.type->fprint(&boolean, stdout, true);
+    boolean.type->dtor(&boolean);
+    builtin_types.boolean.from_cstr(&boolean, &builtin_types.boolean, "false", &endptr);
+    boolean.type->fprint(&boolean, stdout, true);
+    boolean.type->dtor(&boolean);
+    err = builtin_types.boolean.from_cstr(&boolean, &builtin_types.boolean, "blah", &endptr);
+    assert(err);
+
     test_boolean_op(&builtin_types, ' ', true, 0, true, stdout);
     test_boolean_op(&builtin_types, ' ', false, 0, false, stdout);
     test_boolean_op(&builtin_types, '!', true, 0, false, stdout);
@@ -257,6 +268,21 @@ int main(void)
     number.type->fprint(&number, stdout, true);
     number.type->dtor(&number);
 
+    builtin_types.number.from_cstr(&number, &builtin_types.number, "0.0", &endptr);
+    number.type->fprint(&number, stdout, true);
+    number.type->dtor(&number);
+    builtin_types.number.from_cstr(&number, &builtin_types.number, "1.23e45", &endptr);
+    number.type->fprint(&number, stdout, true);
+    number.type->dtor(&number);
+    builtin_types.number.from_cstr(&number, &builtin_types.number, "-12.34E-56", &endptr);
+    number.type->fprint(&number, stdout, true);
+    number.type->dtor(&number);
+    builtin_types.number.from_cstr(&number, &builtin_types.number,"10000.0", &endptr);
+    number.type->fprint(&number, stdout, true);
+    number.type->dtor(&number);
+    err = builtin_types.number.from_cstr(&number, &builtin_types.number, "blah", &endptr);
+    assert(err);
+
     test_number_op(&builtin_types, '+', 1.0, 1.0, 2.0, stdout);
     test_number_op(&builtin_types, '-', 1.0, 1.0, 0.0, stdout);
     test_number_op(&builtin_types, '*', 1.0, 1.0, 1.0, stdout);
@@ -274,6 +300,13 @@ int main(void)
     string.type->dtor(&string);
     string_slice.type->dtor(&string_slice);
 
+    builtin_types.string.from_cstr(&string, &builtin_types.string, "\"Hello, World!\"", &endptr);
+    string.type->fprint(&string, stdout, true);
+    string.type->dtor(&string);
+
+    builtin_types.string.from_cstr(&string, &builtin_types.string, "\" \\a \\b \\\\ \"", &endptr);
+    string.type->fprint(&string, stdout, true);
+    string.type->dtor(&string);
 
     return 0;
 }

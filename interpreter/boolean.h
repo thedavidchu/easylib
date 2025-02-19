@@ -31,7 +31,7 @@ boolean_ctor(struct Object *me, struct ObjectType const *const type, union Objec
 }
 
 int
-boolean_from_cstr(struct Object *me, struct ObjectType const *const type, char const *const cstr, char const **cstr_end)
+boolean_from_cstr(struct Object *const me, struct ObjectType const *const type, char const *const cstr, char const **cstr_end)
 {
     if (me == NULL || type == NULL || cstr == NULL) { return -1; }
     me->type = type;
