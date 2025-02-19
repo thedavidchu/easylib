@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -g
 
 .PHONY: all
-all: clean build object test_array test_table test_string
+all: clean build object test_array test_table test_string test_ez_log
 
 .PHONY: build
 build:
@@ -24,6 +24,10 @@ test_table: build
 test_string: build
 	$(CC) $(CFLAGS) test_string.c -o build/test_string
 
+.PHONY: test_ez_log
+test_ez_log: build
+	$(CC) $(CFLAGS) test_ez_log.c -o build/test_ez_log
+
 .PHONY: clean
 clean:
 	rm -rf build
@@ -34,4 +38,5 @@ test: all
 	./build/test_array
 	./build/test_table
 	./build/test_string
+	./build/test_ez_log
 
