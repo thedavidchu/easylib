@@ -10,8 +10,10 @@
 #pragma once
 
 #include <assert.h>
+#include <bits/stdint-uintn.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 
 struct Object;
@@ -107,6 +109,7 @@ struct ObjectType {
     int (*call)(struct Object const *const,
                 struct Object *const arg,
                 struct Object *const result);
+    int (*hash)(struct Object const *const, uint64_t *const result);
 };
 
 // Quick lookup - this is a singleton object!
@@ -132,60 +135,66 @@ struct Object {
 /// @note   This is for the sole purpose of checking that we initialize all
 /// fields.
 struct ObjectType
-new_object_type(
-    enum BuiltinObjectType type,
-    int (*ctor)(struct Object *const,
-                struct Global const *const,
-                union ObjectData),
-    int (*dtor)(struct Object *const),
-    int (*cmp)(struct Object const *const,
-               struct Object const *const,
-               int *const result),
-    int (*fprint)(struct Object const *const,
-                  FILE *const fp,
-                  bool const newline),
-    int (*from_cstr)(struct Object *const me,
-                     struct Global const *const type,
-                     char const *const text,
-                     char const **end_cstr),
-    // String, array, or table
-    int (*len)(struct Object const *const, size_t *const result),
-    int (*cap)(struct Object const *const, size_t *const result),
-    int (*insert)(struct Object *const, size_t const idx, struct Object *const),
-    int (*get)(struct Object *const, size_t const idx, struct Object **const),
-    int (*slice)(struct Object const *const,
-                 size_t const start,
-                 size_t const end,
-                 struct Object *const),
-    int (*remove)(struct Object *const,
-                  size_t const idx,
-                  struct Object **const),
-    // Number
-    int (*add)(struct Object const *const,
-               struct Object const *const,
-               struct Object *const),
-    int (*sub)(struct Object const *const,
-               struct Object const *const,
-               struct Object *const),
-    int (*mul)(struct Object const *const,
-               struct Object const *const,
-               struct Object *const),
-    int (*div)(struct Object const *const,
-               struct Object const *const,
-               struct Object *const),
-    // Boolean
-    int (*not )(struct Object const *const, bool *const result),
-    int (*and)(struct Object const *const,
-               struct Object const *const,
-               bool *const result),
-    int (* or)(struct Object const *const,
-               struct Object const *const,
-               bool *const result),
-    int (*truthiness)(struct Object const *const, bool *const result),
-    // Function
-    int (*call)(struct Object const *const,
-                struct Object *const arg,
-                struct Object *const result));
+new_object_type(enum BuiltinObjectType type,
+                int (*ctor)(struct Object *const,
+                            struct Global const *const,
+                            union ObjectData),
+                int (*dtor)(struct Object *const),
+                int (*cmp)(struct Object const *const,
+                           struct Object const *const,
+                           int *const result),
+                int (*fprint)(struct Object const *const,
+                              FILE *const fp,
+                              bool const newline),
+                int (*from_cstr)(struct Object *const me,
+                                 struct Global const *const type,
+                                 char const *const text,
+                                 char const **end_cstr),
+                // String, array, or table
+                int (*len)(struct Object const *const me, size_t *const result),
+                int (*cap)(struct Object const *const me, size_t *const result),
+                int (*insert)(struct Object *const me,
+                              size_t const idx,
+                              struct Object *const),
+                int (*get)(struct Object *const me,
+                           size_t const idx,
+                           struct Object **const),
+                int (*slice)(struct Object const *const me,
+                             size_t const start,
+                             size_t const end,
+                             struct Object *const result),
+                int (*remove)(struct Object *const,
+                              size_t const idx,
+                              struct Object **const),
+                // Number
+                int (*add)(struct Object const *const,
+                           struct Object const *const,
+                           struct Object *const),
+                int (*sub)(struct Object const *const,
+                           struct Object const *const,
+                           struct Object *const),
+                int (*mul)(struct Object const *const,
+                           struct Object const *const,
+                           struct Object *const),
+                int (*div)(struct Object const *const,
+                           struct Object const *const,
+                           struct Object *const),
+                // Boolean
+                int (*not )(struct Object const *const, bool *const result),
+                int (*and)(struct Object const *const,
+                           struct Object const *const,
+                           bool *const result),
+                int (* or)(struct Object const *const,
+                           struct Object const *const,
+                           bool *const result),
+                int (*truthiness)(struct Object const *const,
+                                  bool *const result),
+                // Function
+                int (*call)(struct Object const *const me,
+                            struct Object *const arg,
+                            struct Object *const result),
+                int (*hash)(struct Object const *const me,
+                            uint64_t *const result));
 
 // All objects
 int
@@ -257,5 +266,50 @@ phony_call(struct Object const *const,
            struct Object *const arg,
            struct Object *const result);
 
+int
+phony_hash(struct Object const *const me, uint64_t *const hash);
+
 void
 init_builtin_object_types(struct BuiltinObjectTypes *const types);
+
+// Convenience functions
+
+static inline bool
+object_same_global(struct Object const *const lhs,
+                   struct Object const *const rhs)
+{
+    return lhs->global == rhs->global;
+}
+
+static inline bool
+object_same_type(struct Object const *const lhs, struct Object const *const rhs)
+{
+    return lhs->type == rhs->type;
+}
+
+static inline int
+object_dtor(struct Object *const me)
+{
+    if (me == NULL) {
+        return -1;
+    }
+    return me->type->dtor(me);
+}
+
+static inline int
+object_fprint(struct Object const *const me, FILE *const fp, bool const newline)
+{
+    if (me == NULL || fp == NULL) {
+        return -1;
+    }
+    return me->type->fprint(me, fp, newline);
+}
+
+static inline int
+object_hash(struct Object const *const me, uint64_t *const result)
+{
+    if (me == NULL || result == NULL) {
+        return -1;
+    }
+    return me->type->hash(me, result);
+}

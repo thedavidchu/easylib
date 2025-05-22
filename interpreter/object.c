@@ -1,3 +1,4 @@
+#include <bits/stdint-uintn.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -25,6 +26,7 @@ phony_ctor(struct Object *const me,
 int
 phony_dtor(struct Object *const me)
 {
+    (void)me;
     return -100;
 }
 int
@@ -32,6 +34,9 @@ phony_cmp(struct Object const *const me,
           struct Object const *const other,
           int *const result)
 {
+    (void)me;
+    (void)other;
+    (void)result;
     return -100;
 }
 int
@@ -49,17 +54,22 @@ phony_from_cstr(struct Object *const me,
     (void)me;
     (void)global;
     (void)cstr;
+    (void)end_cstr;
     return -100;
 }
 // String, array, or table
 int
 phony_len(struct Object const *const me, size_t *const result)
 {
+    (void)me;
+    (void)result;
     return -100;
 }
 int
 phony_cap(struct Object const *const me, size_t *const result)
 {
+    (void)me;
+    (void)result;
     return -100;
 }
 int
@@ -67,6 +77,9 @@ phony_insert(struct Object *const me,
              size_t const idx,
              struct Object *const result)
 {
+    (void)me;
+    (void)idx;
+    (void)result;
     return -100;
 }
 int
@@ -74,14 +87,21 @@ phony_get(struct Object *const me,
           size_t const idx,
           struct Object **const result)
 {
+    (void)me;
+    (void)idx;
+    (void)result;
     return -100;
 }
 int
-phony_slice(struct Object const *const,
+phony_slice(struct Object const *const me,
             size_t const start,
             size_t const end,
-            struct Object *const)
+            struct Object *const result)
 {
+    (void)me;
+    (void)start;
+    (void)end;
+    (void)result;
     return -100;
 }
 int
@@ -89,6 +109,9 @@ phony_remove(struct Object *const me,
              size_t const idx,
              struct Object **const result)
 {
+    (void)me;
+    (void)idx;
+    (void)result;
     return -100;
 }
 // Number
@@ -97,6 +120,9 @@ phony_add(struct Object const *const me,
           struct Object const *const other,
           struct Object *const result)
 {
+    (void)me;
+    (void)other;
+    (void)result;
     return -100;
 }
 int
@@ -104,6 +130,9 @@ phony_sub(struct Object const *const me,
           struct Object const *const other,
           struct Object *const result)
 {
+    (void)me;
+    (void)other;
+    (void)result;
     return -100;
 }
 int
@@ -111,6 +140,9 @@ phony_mul(struct Object const *const me,
           struct Object const *const other,
           struct Object *const result)
 {
+    (void)me;
+    (void)other;
+    (void)result;
     return -100;
 }
 int
@@ -118,12 +150,17 @@ phony_div(struct Object const *const me,
           struct Object const *const other,
           struct Object *const result)
 {
+    (void)me;
+    (void)other;
+    (void)result;
     return -100;
 }
 // Boolean
 int
 phony_not(struct Object const *const me, bool *const result)
 {
+    (void)me;
+    (void)result;
     return -100;
 }
 int
@@ -131,6 +168,9 @@ phony_and(struct Object const *const me,
           struct Object const *const other,
           bool *const result)
 {
+    (void)me;
+    (void)other;
+    (void)result;
     return -100;
 }
 int
@@ -138,11 +178,16 @@ phony_or(struct Object const *const me,
          struct Object const *const other,
          bool *const result)
 {
+    (void)me;
+    (void)other;
+    (void)result;
     return -100;
 }
 int
 phony_truthiness(struct Object const *const me, bool *const result)
 {
+    (void)me;
+    (void)result;
     return -100;
 }
 // Function
@@ -151,11 +196,22 @@ phony_call(struct Object const *const me,
            struct Object *const arg,
            struct Object *const result)
 {
+    (void)me;
+    (void)arg;
+    (void)result;
+    return -100;
+}
+
+int
+phony_hash(struct Object const *const me, uint64_t *const hash)
+{
+    (void)me;
+    (void)hash;
     return -100;
 }
 
 /// @note   This is for the sole purpose of checking that we initialize all
-/// fields.
+///         fields.
 struct ObjectType
 new_object_type(
     enum BuiltinObjectType type,
@@ -210,7 +266,8 @@ new_object_type(
     // Function
     int (*call)(struct Object const *const,
                 struct Object *const arg,
-                struct Object *const result))
+                struct Object *const result),
+    int (*hash)(struct Object const *const me, uint64_t *const result))
 {
     return (struct ObjectType){
         .type = type,
@@ -234,6 +291,7 @@ new_object_type(
         .or = or ? or : phony_or,
         .truthiness = truthiness ? truthiness : phony_truthiness,
         .call = call ? call : phony_call,
+        .hash = hash ? hash : phony_hash,
     };
 }
 
@@ -247,6 +305,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
                                      nothing_cmp,
                                      nothing_fprint,
                                      nothing_from_cstr,
+                                     NULL,
                                      NULL,
                                      NULL,
                                      NULL,
@@ -282,6 +341,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
                                      boolean_and,
                                      boolean_or,
                                      boolean_truthiness,
+                                     NULL,
                                      NULL);
     types->number = new_object_type(OBJECT_TYPE_NUMBER,
                                     number_ctor,
@@ -299,6 +359,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
                                     number_sub,
                                     number_mul,
                                     number_div,
+                                    NULL,
                                     NULL,
                                     NULL,
                                     NULL,
@@ -324,8 +385,10 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
                                     NULL,
                                     NULL,
                                     NULL,
+                                    NULL,
                                     NULL);
     types->array = new_object_type(OBJECT_TYPE_ARRAY,
+                                   NULL,
                                    NULL,
                                    NULL,
                                    NULL,
@@ -366,6 +429,7 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
                                    NULL,
                                    NULL,
                                    NULL,
+                                   NULL,
                                    NULL);
     types->function = new_object_type(OBJECT_TYPE_FUNCTION,
                                       NULL,
@@ -387,8 +451,10 @@ init_builtin_object_types(struct BuiltinObjectTypes *const types)
                                       NULL,
                                       NULL,
                                       NULL,
+                                      NULL,
                                       NULL);
     types->custom = new_object_type(OBJECT_TYPE_CUSTOM,
+                                    NULL,
                                     NULL,
                                     NULL,
                                     NULL,

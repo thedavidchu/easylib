@@ -14,8 +14,8 @@ enum TableNodeStatus {
 
 struct TableNode {
     enum TableNodeStatus status;
-    size_t key;
-    size_t value;
+    struct Object const *key;
+    struct Object *value;
 };
 
 struct Table {
@@ -36,11 +36,17 @@ table_fprint(struct Table const *const me, FILE *const fp, bool const newline);
 
 /// @brief  Insert or update the value associated with a key.
 int
-table_insert(struct Table *const me, size_t const key, size_t const value);
+table_insert(struct Table *const me,
+             struct Object const *const key,
+             struct Object *const value);
 
 /// @brief  Get a value associated with a key (the table maintains ownership).
 int
-table_get(struct Table *const me, size_t const key, size_t *const value);
+table_get(struct Table *const me,
+          struct Object const *const key,
+          struct Object **const value);
 
 int
-table_remove(struct Table *const me, size_t const key, size_t *const value);
+table_remove(struct Table *const me,
+             struct Object const *const key,
+             struct Object **const value);

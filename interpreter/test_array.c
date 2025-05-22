@@ -49,7 +49,7 @@ test_legal_mod(char const *const test_name,
     printf("> \tRemove 0..10\n");
     for (i = 0; i < 10; ++i) {
         idx = del(&a);
-        err = array_remove(&a, idx, (void **)&victim);
+        err = array_remove(&a, idx, (struct Object **)&victim);
         assert(!err);
         printf("> \t\tRemoved %zu from %zu: ", victim, idx);
         err = array_fprint(&a, stdout, true);
@@ -99,7 +99,7 @@ test_illegal_mod(void)
     printf("> \tRemove 0..10: ");
     for (i = 0; i < 10; ++i) {
         // NOTE I do not free the victim, since they're just illegal pointers.
-        err = array_remove(&a, 0, (void **)&victim);
+        err = array_remove(&a, 0, (struct Object **)&victim);
         assert(!err);
     }
     err = array_fprint(&a, stdout, true);
@@ -133,19 +133,19 @@ test_access(void)
 
     printf("> \tAccess LEGAL positions 0..10\n");
     for (i = 0; i < 10; ++i) {
-        err = array_get(&a, i, (void **)&victim);
+        err = array_get(&a, i, (struct Object **)&victim);
         assert(!err);
         assert(victim == i);
     }
 
     printf("> \tFail accessing ILLEGAL position %zu\n", a.length);
-    err = array_get(&a, a.length, (void **)&victim);
+    err = array_get(&a, a.length, (struct Object **)&victim);
     assert(err == -1);
 
     printf("> \tRemove 0..10\n");
     for (i = 0; i < 10; ++i) {
         // NOTE I do not free the victim, since they're just illegal pointers.
-        err = array_remove(&a, 0, (void **)&victim);
+        err = array_remove(&a, 0, (struct Object **)&victim);
         assert(!err);
     }
 

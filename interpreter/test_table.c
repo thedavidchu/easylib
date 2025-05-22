@@ -17,7 +17,7 @@ main(void)
     table_fprint(&t, stdout, true);
     printf("> \tInsert keys 0..10\n");
     for (size_t i = 0; i < 10; ++i) {
-        err = table_insert(&t, i, i);
+        err = table_insert(&t, (struct Object *)i, (struct Object *)i);
         assert(!err);
         printf("> \t\tInserted %zu: %zu: ", i, i);
         err = table_fprint(&t, stdout, true);
@@ -26,22 +26,22 @@ main(void)
 
     printf("> \tGet keys 0..10\n");
     for (size_t i = 0; i < 10; ++i) {
-        err = table_get(&t, i, &victim);
+        err = table_get(&t, (struct Object *)i, (struct Object **)&victim);
         assert(!err);
         assert(victim == i);
     }
 
     printf("> \tFail getting ILLEGAL key\n");
-    err = table_get(&t, 11, &victim);
+    err = table_get(&t, (struct Object *)11, (struct Object **)&victim);
     assert(err == -1);
 
     printf("> \tFail removing ILLEGAL key\n");
-    err = table_remove(&t, 11, &victim);
+    err = table_remove(&t, (struct Object *)11, (struct Object **)&victim);
     assert(err == -1);
 
     printf("> \tRemove keys 0..10\n");
     for (size_t i = 0; i < 10; ++i) {
-        err = table_remove(&t, i, &victim);
+        err = table_remove(&t, (struct Object *)i, (struct Object **)&victim);
         assert(!err);
         assert(victim == i);
         printf("> \t\tRemoved %zu: %zu: ", i, victim);
@@ -50,7 +50,7 @@ main(void)
     }
 
     printf("> \tFail removing already-removed key\n");
-    err = table_remove(&t, 0, &victim);
+    err = table_remove(&t, (struct Object *)0, (struct Object **)&victim);
     assert(err == -1);
 
     err = table_dtor(&t);

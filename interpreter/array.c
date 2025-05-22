@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "array.h"
+#include "object.h"
 
 #define FILTER(func_call)                                                      \
     do {                                                                       \
@@ -17,6 +18,9 @@
 
 static size_t const DEFAULT_ARRAY_CAPACITY = 8;
 static double const DEFAULT_GROWTH_FACTOR = 2;
+
+//
+static bool debug = true;
 
 static bool
 ok(struct Array const *const me)
@@ -46,7 +50,8 @@ resize(struct Array *const me, size_t const new_capacity)
         return -1;
     }
     // TODO Ensure no overflow in multiplication.
-    void **new_array = realloc(me->array, sizeof(*me->array) * new_capacity);
+    struct Object **new_array =
+        realloc(me->array, sizeof(*me->array) * new_capacity);
     if (new_capacity != 0 && new_array == NULL) {
         return -1;
     }
@@ -120,6 +125,14 @@ array_dtor(struct Array *const me)
     }
     assert(ok(me));
     // TODO Destroy elements in this array recursively.
+    for (size_t i = 0; i < me->length; ++i) {
+        if (!debug) {
+            int err = 0;
+            if ((err = object_dtor(me->array[i]))) {
+                return err;
+            }
+        }
+    }
     free(me->array);
     *me = (struct Array){0};
     return 0;
@@ -131,14 +144,21 @@ array_fprint(struct Array const *const me, FILE *const fp, bool newline)
     size_t i = 0;
     fprintf(fp, "(len: %zu, cap: %zu) [", me->length, me->capacity);
     for (i = 0; i < me->length; ++i) {
-        fprintf(fp, "%p%s", me->array[i], i + 1 < me->length ? ", " : "");
+        if (debug) {
+            fprintf(fp, "%p", (void *)me->array[i]);
+        } else {
+            object_fprint(me->array[i], fp, false);
+        }
+        fprintf(fp, "%s", i + 1 < me->length ? ", " : "");
     }
     fprintf(fp, "]%s", newline ? "\n" : "");
     return 0;
 }
 
 int
-array_insert(struct Array *const me, size_t const idx, void *const item)
+array_insert(struct Array *const me,
+             size_t const idx,
+             struct Object *const item)
 {
     if (me == NULL || me->array == NULL) {
         return -1;
@@ -158,7 +178,9 @@ array_insert(struct Array *const me, size_t const idx, void *const item)
 }
 
 int
-array_get(struct Array *const me, size_t const idx, void **const result)
+array_get(struct Array *const me,
+          size_t const idx,
+          struct Object **const result)
 {
     if (me == NULL || me->array == NULL) {
         return -1;
@@ -177,7 +199,9 @@ array_get(struct Array *const me, size_t const idx, void **const result)
 }
 
 int
-array_remove(struct Array *const me, size_t const idx, void **const victim)
+array_remove(struct Array *const me,
+             size_t const idx,
+             struct Object **const victim)
 {
     if (me == NULL || me->array == NULL) {
         return -1;

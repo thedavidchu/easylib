@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <bits/stdint-uintn.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -6,7 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "object.h"
 #include "table.h"
+
+static bool debug = true;
 
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FILTER(func_call)                                                      \
@@ -17,10 +21,17 @@
         }                                                                      \
     } while (0)
 
-static size_t
-hash(size_t const x)
+static uint64_t
+hash(struct Object const *const x)
 {
-    return x;
+    uint64_t result = 0;
+    if (debug) {
+        result = (uint64_t)x;
+    } else {
+        int err = object_hash(x, &result);
+        assert(!err);
+    }
+    return result;
 }
 
 static bool
@@ -54,7 +65,7 @@ ok(struct Table const *const me)
 
 /// @brief  Get the index of the key or SIZE_MAX.
 static size_t
-get_index(struct Table const *const me, size_t const key)
+get_index(struct Table const *const me, struct Object const *const key)
 {
     size_t const h = hash(key);
     assert(me && me->data && me->capacity);
@@ -74,7 +85,7 @@ get_index(struct Table const *const me, size_t const key)
 
 /// @brief  Get the would-be or actual index of the key or SIZE_MAX.
 static size_t
-get_maybe_index(struct Table *const me, size_t const key)
+get_maybe_index(struct Table const *const me, struct Object const *const key)
 {
     size_t const h = hash(key);
     assert(me && me->data && me->capacity);
@@ -162,11 +173,18 @@ table_fprint(struct Table const *const me, FILE *const fp, bool const newline)
     for (size_t i = 0; i < me->capacity; ++i) {
         if (me->data[i].status == TABLE_NODE_VALID) {
             ++cnt;
-            fprintf(fp,
-                    "%zu: %zu%s",
-                    me->data[i].key,
-                    me->data[i].value,
-                    cnt < me->length ? ", " : "");
+            if (debug) {
+                fprintf(fp,
+                        "%zu: %zu%s",
+                        (size_t)me->data[i].key,
+                        (size_t)me->data[i].value,
+                        cnt < me->length ? ", " : "");
+            } else {
+                object_fprint(me->data[i].key, fp, false);
+                fprintf(fp, ": ");
+                object_fprint(me->data[i].value, fp, false);
+                fprintf(fp, "%s", cnt < me->length ? ", " : "");
+            }
         }
     }
     fprintf(fp, "}%s", newline ? "\n" : "");
@@ -174,7 +192,9 @@ table_fprint(struct Table const *const me, FILE *const fp, bool const newline)
 }
 
 int
-table_insert(struct Table *const me, size_t const key, size_t const value)
+table_insert(struct Table *const me,
+             struct Object const *const key,
+             struct Object *const value)
 {
     size_t idx = 0;
     if (me == NULL || me->data == NULL) {
@@ -200,7 +220,9 @@ table_insert(struct Table *const me, size_t const key, size_t const value)
 }
 
 int
-table_get(struct Table *const me, size_t const key, size_t *const value)
+table_get(struct Table *const me,
+          struct Object const *const key,
+          struct Object **const value)
 {
     size_t idx = 0;
     if (me == NULL || me->data == NULL) {
@@ -218,7 +240,9 @@ table_get(struct Table *const me, size_t const key, size_t *const value)
 }
 
 int
-table_remove(struct Table *const me, size_t const key, size_t *const value)
+table_remove(struct Table *const me,
+             struct Object const *const key,
+             struct Object **const value)
 {
     size_t idx = 0;
     if (me == NULL || me->data == NULL) {
